@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" href="css/main.css"> 
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://unpkg.com/d3-template-plugin/build/d3-template.min.js"></script>
+		<script src="js/main.js"></script>
+		<title>mijn.mxi.nl</title>
+	</head>
+	<body>
+		<div id="home" class="page">
+			<div>
+				<a href="#projects">Projects</a>
+			</div>
+			<div>
+				<a href="#members">Members</a>
+			</div>
+		</div>
+		<div id="projects" class="page">
+			<ul data-repeat="{{.}}">
+				<li>{{name}}</li>
+			</ul>
+		</div>
+		<div id="members" class="page">
+			<ul data-repeat="{{.}}">
+				<li><span>{{name}}</span> - <span>{{email}}</span></li>
+			</ul>
+		</div>
+	</body>
+</html>
