@@ -14,8 +14,31 @@ var pages = {
 		}
 	},
 	members: {
+		beforeShow: function(pageNode) {
+			if(!selections.project) {
+				console.error("No project selected!");
+				return;
+			}
+			d3.json("/api/projects/" + selections.project.id + "/members", function(error, data) {
+				if(error) {
+					console.error(error);
+				} else if(data) {
+					d3.select(pageNode).render(data);
+				}
+			});
+		}
+	},
+	member: {
+		beforeShow: function(pageNode) {
+			if(!selections.member) {
+				console.error("No member selected!");
+				return;
+			}
+			d3.select(pageNode).render(selections.member);
+		}
 	}
 };
+var selections = {};
 
 // Show page
 function showPage(id) {
@@ -55,6 +78,16 @@ function initializeAfterLoad() {
 				stopEventFully();
 			});
 		}
+	});
+
+	// Add event handlers to list items
+	d3.select("#projects li").on("click", function(d) {
+		selections.project = d;
+		showPage("members");
+	});
+	d3.select("#members li").on("click", function(d) {
+		selections.member = d;
+		showPage("member");
 	});
 
 	// Create templates from pages

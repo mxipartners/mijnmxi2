@@ -10,22 +10,29 @@
 	</head>
 	<body>
 		<div id="home" class="page">
-			<div>
-				<a href="#projects">Projects</a>
-			</div>
-			<div>
-				<a href="#members">Members</a>
-			</div>
+			<a class="nav" href="#projects">Projects</a>
+			<a class="nav" href="#members">Members</a>
 		</div>
 		<div id="projects" class="page">
+			Projects page
 			<ul data-repeat="{{.}}">
 				<li>{{name}}</li>
 			</ul>
+			<a class="nav" href="#home">Back</a>
 		</div>
 		<div id="members" class="page">
+			Members page
 			<ul data-repeat="{{.}}">
 				<li><span>{{name}}</span> - <span>{{email}}</span></li>
 			</ul>
+			<a class="nav" href="#home">Back</a>
+		</div>
+		<div id="member", class="page">
+			Member page
+			<h1>{{name}}</h1>
+			<h3>{{shortName}}</h3>
+			<h3>{{email}}</h3>
+			<a class="nav" href="#home">Back</a>
 		</div>
 	</body>
 </html>

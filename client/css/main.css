@@ -26,3 +26,13 @@ body {
 .page.selected {
 	display: block;
 }
+
+.page li {
+	cursor: pointer;
+}
+
+a.nav {
+	display: block;
+	padding-top: 0.3em;
+	padding-bottom: 0.3em;
+}

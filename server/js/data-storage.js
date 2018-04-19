@@ -32,5 +32,5 @@ db.exec("CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY, sender INTE
 Object.assign(statements, {
 	getAllProjects: db.prepare("SELECT * FROM projects"),
 	getProjectWithId: db.prepare("SELECT * FROM projects WHERE id = :projectId"),
-	getMembersForProjectWithId: db.prepare("SELECT users.id, name, shortName FROM users INNER JOIN members ON users.id = members.userId WHERE projectId = :projectId")
+	getMembersForProjectWithId: db.prepare("SELECT users.id, name, shortName, email FROM users INNER JOIN members ON users.id = members.userId WHERE projectId = :projectId")
 });
