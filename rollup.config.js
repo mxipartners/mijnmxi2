@@ -21,6 +21,8 @@ export default {
     builtins()
   ],
   external: [
-    "http"
+    "http",
+    "https",
+    "fs"
   ]
 };

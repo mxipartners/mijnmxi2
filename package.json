@@ -21,7 +21,7 @@
     "url": "https://github.com/mxipartners/mijnmxi2"
   },
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup -c",
+    "pretest": "rimraf build && mkdir build && rollup -c",
     "test": "tape 'server/test/**/*-test.js' && eslint server/js server/test",
     "prepublish": "npm run test && uglifyjs build/servers.js -c -m -o build/servers.min.js"
   },
@@ -39,6 +39,7 @@
     "tape": "4",
     "uglify-js": "^2.8.11",
     "node-es-module-loader": "^0.3",
-    "nodemon": "^1"
+    "nodemon": "^1",
+    "rimraf": "^2"
   }
 }
