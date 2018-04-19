@@ -1,0 +1,6 @@
+bin/
+build/
+node_modules/
+private/
+server/db/work.db
+*.swp
