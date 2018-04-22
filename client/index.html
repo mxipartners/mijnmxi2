@@ -34,5 +34,29 @@
 			<h3>{{email}}</h3>
 			<a class="nav" href="#home">Back</a>
 		</div>
+		<div id="login" class="page">
+			Login page
+			<form action="">
+				<label for="emailInput">Email-adres</label>
+				<input id="emailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+				<label for="passwordInput">Wachtwoord</label>
+				<input id="passwordInput" type="password" autocomplete="current-password" required>
+			</form>
+			<a class="nav" href="#userRegistration">Nieuwe gebruiker</a>
+			<a class="nav" href="#home">Back</a>
+		</div>
+		<div id="userRegistration" class="page">
+			User registration page
+			<form action="">
+				<label>Email adres</label>
+				<input name="email" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+			</form>
+			<a class="action" href="#register">Registreer</a>
+			<a class="nav" href="#home">Back</a>
+		</div>
+		<div id="userActivation" class="page">
+			User activation page
+			<a class="nav" href="#home">Back</a>
+		</div>
 	</body>
 </html>

@@ -1,58 +1,128 @@
 // Constants
 var PATH_SEPARATOR = "/";
 var LEADING_PATH_SEPARATORS_REGEX = /^\/+/;
+var ERROR_RESULT = {};	// Simple placeholder
+var NO_DATA_FOUND = { result: ERROR_RESULT, code: 200, message: "No resource found" };
+var INVALID_DATA = { result: ERROR_RESULT, code: 400, message: "Bad request" };
 
 // Globals
 var dataStorage = require("./data-storage");
 var handlers = [
 	{
 		path: "/api/projects",
-		responseData: function() { return dataStorage.getAllProjects(); }
+		actions: {
+			GET: function() { return dataStorage.getAllProjects() || NO_DATA_FOUND; }
+		}
 	},
 	{
 		path: "/api/projects/:projectId",
-		responseData: function(params) { return dataStorage.getProjectWithId(params); }
+		actions: {
+			GET: function(params) { return dataStorage.getProjectWithId(params) || NO_DATA_FOUND; }
+		}
 	},
 	{
 		path: "/api/projects/:projectId/members",
-		responseData: function(params) { return dataStorage.getMembersForProjectWithId(params); }
+		actions: {
+			GET: function(params) { return dataStorage.getMembersForProjectWithId(params) || NO_DATA_FOUND; }
+		}
+	},
+	{
+		path: "/api/users",
+		actions: {
+			POST: function(params, data) {
+
+				// Only allow a single email address with domain "mxi.nl" as valid input
+				if(Object.keys(data).length > 1 || !data.email || !/^[^\s@]+@mxi.nl$/.test(data.email)) {
+					return INVALID_DATA;
+				}
+				return dataStorage.addUser(data) || INVALID_DATA;
+			}
+		}
 	}
 ];
 
 // Data request handler
-module.exports = function(request, response) {
+function dataHandler(request, response) {
 	var url = request.url;
-	console.log("Handling request " + url);
+	console.log("Handling " + request.method + " request " + url);
 
-	// Try handlers until request is handled successfully
-	handlers.some(function(handler) {
-		return matchesUrl(url, handler.path, function(params) {
+	// Find (first) matching handler (using array.reduce)
+	var matchResult = handlers.reduce(function(result, handler) {
 
-			// Found matching handler, create response data
-			var data = handler.responseData(params);
-			if(data !== undefined) {
+		// If already have a result, answer it
+		if(result) {
+			return result;
+		}
 
-				// Send response
-				response.writeHead(200, { "Content-Type": "application/json" }); 
-				response.end(JSON.stringify(data));
-			} else {
+		// Find next match
+		var params = matchesUrl(url, handler.path);
+		if(params === false) {
 
-				// No data found
-				response.writeHead(404);
-				response.end("Resource not found");
-			}
-		});
+			// No match found
+			return false;
+		}
+
+		// Found match
+		return {
+			handler: handler,
+			params: params
+		};
+	}, false);
+
+	// Stop if no match is found
+	if(!matchResult) {
+
+		// No handler matches URL
+		response.writeHead(404);
+		response.end("Resource not found");
+		return;
+	}
+
+	// Check presence of correct handler action
+	var action = matchResult.handler.actions[request.method];
+	if(!action) {
+
+		// Invalid method
+		response.writeHead(405);
+		response.end("Method not allowed");
+		return;
+	}
+
+	// Collect request data and perform handler action
+	withRequestDataDo(request, function(error, requestData) {
+
+		// Validate result
+		if(error) {
+			console.error("Internal Error. Failed to retrieve data from request.", error);
+			response.writeHead(500);
+			response.end("Internal error");
+			return;
+		}
+
+		// Perform handler action
+		var responseData = action.call(null, matchResult.params, requestData);
+		if(!responseData) {
+
+			// No response data found
+			response.writeHead(404);
+			response.end("Resource not found");
+			return;
+		}
+
+		// Send response data
+		response.writeHead(200, { "Content-Type": "application/json" }); 
+		response.end(JSON.stringify(responseData));
 	});
-
-	// No valid handler found
-	response.writeHead(404);
-	response.end("Resource not found");
 };
 
-// URL mapping
-function matchesUrl(url, path, callback) {
+// Match url against provided path
+// Answer a parameter object for the match found (may be empty object in case no parameters are present on url)
+// For example:
+//     matchesUrl("/api/projects/123/members/2", "/api/projects/:projectId/members/:memberId") =>
+//     { "projectId": 123, "memberId": 2 }
+function matchesUrl(url, path) {
 
-	// Iterate over path segments
+	// Iterate over path segments (using array.reduce)
 	var pathSegments = path
 		.replace(LEADING_PATH_SEPARATORS_REGEX, "")
 		.split(PATH_SEPARATOR)
@@ -82,6 +152,8 @@ function matchesUrl(url, path, callback) {
 			}
 			var value = url.slice(0, valueEndIndex);	// Parameter value
 			if(value.length === 0) {
+
+				// No value found, fail
 				return false;
 			}
 
@@ -95,7 +167,9 @@ function matchesUrl(url, path, callback) {
 
 			// Match path segment
 			if(!url.startsWith(pathSegment)) {
-				return false;	// No match, fail
+
+				// No match, fail
+				return false;
 			}
 
 			// Remove path segment and move on to next segment
@@ -110,10 +184,30 @@ function matchesUrl(url, path, callback) {
 		return false;
 	}
 
-	// Perform callback on valid result
-	if(result !== false) {
-		callback(result);
-	}
-
 	return result;
 }
+
+// Extract JSON data from request
+function withRequestDataDo(request, callback) {
+
+	// Validate we received JSON data
+	if(request.headers["content-type"] === "application/json") {
+
+		// Extract data and call callback function with result
+		var data = "";
+		request.on("data", function(chunk) { data += chunk; });
+		request.on("end", function() {
+			callback(null, JSON.parse(data));
+		});
+		request.on("error", function(error) {
+			callback(error, null);
+		});
+	} else {
+
+		// Call callback with 'undefined' (ie no request data present)
+		callback(null, undefined);
+	}
+}
+
+// Export data handler
+module.exports = dataHandler;

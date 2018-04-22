@@ -31,8 +31,38 @@ body {
 	cursor: pointer;
 }
 
+input {
+	border-style: solid;
+	border-width: 1px;
+	border-color: #333;
+	box-shadow: none;
+}
+
+input:required + span.required::after {
+	display: inline-block;
+	content: "*";
+}
+
+input:invalid {
+	border-width: 2px;
+	border-color: #f00;
+}
+
+:invalid,
+:-moz-submit-invalid,
+:-moz-ui-invalid {
+	box-shadow: none;
+}
+
 a.nav {
 	display: block;
 	padding-top: 0.3em;
 	padding-bottom: 0.3em;
+}
+
+a.action {
+	display: inline-block;
+	border: 1px solid #333;
+	border-radius: 4px;
+	padding: 0.3em;
 }
