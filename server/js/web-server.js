@@ -36,13 +36,14 @@ var webServer = https.createServer(webServerOptions, function(request, response)
 	}
 
 	// Handle regular request
-	fs.readFile("client" + request.url, function(error, data) {
+	var urlWithoutParameters = url.replace(/[?#].*/, "");
+	fs.readFile("client" + urlWithoutParameters, function(error, data) {
 		if(error) {
-			console.error("Error on web-request", error, url);
+			console.error("Error on web-request", error, urlWithoutParameters);
 			response.writeHead(404);
 			response.end("Resource not found");
 		} else {
-			var extension = url.replace(/^.*\.([^.]+)$/, "$1");
+			var extension = urlWithoutParameters.replace(/^.*\.([^.]+)$/, "$1");
 			var contentType = contentTypes[extension];
 			if(!contentType) {
 				contentType = defaultContentType;

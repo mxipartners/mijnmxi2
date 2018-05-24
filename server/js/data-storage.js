@@ -1,4 +1,5 @@
 // Globals
+var resultCodes = require("./result-codes");
 var Database = require("better-sqlite3");
 var db = new Database("server/db/work.db");
 var statements = {};
@@ -42,9 +43,21 @@ var dataStorage = {
 			return { id: info.lastInsertROWID };
 		} catch(error) {
 			if(error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-				return { code: 409, message: "Conflict" };
+				return resultCodes.uniqueConstraintViolation;
 			}
 			console.error("Add user failed", error);
+		}
+		return undefined;
+	},
+	activateUser: function(data) {
+		try {
+			var info = statements.activateUser.run(data);
+			if(info.changes !== 1) {
+				return resultCodes.noResourceFound;
+			}
+			return { id: 0 }
+		} catch(error) {
+			console.error("Activate user failed", error);
 		}
 		return undefined;
 	}
@@ -88,6 +101,9 @@ Object.assign(statements, {
 	),
 	addUser: db.prepare(
 		"INSERT INTO users (email, passwordHash, activationTimestamp, activationToken, activationExpiration) VALUES (:email, :passwordHash, 0, :activationToken, :activationExpiration)"
+	),
+	activateUser: db.prepare(
+		"UPDATE users SET activationTimestamp = :now, activationExpiration = 0 WHERE activationToken = :activationToken AND activationExpiration >= :now AND activationTimestamp = 0"
 	)
 });
 

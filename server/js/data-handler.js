@@ -1,39 +1,38 @@
 // Constants
 var PATH_SEPARATOR = "/";
 var LEADING_PATH_SEPARATORS_REGEX = /^\/+/;
-var ERROR_RESULT = {};	// Simple placeholder
-var NO_DATA_FOUND = { result: ERROR_RESULT, code: 200, message: "No resource found" };
-var INVALID_DATA = { result: ERROR_RESULT, code: 400, message: "Bad request" };
 
 // Globals
+var resultCodes = require("./result-codes");
 var dataStorage = require("./data-storage");
 var users = require("./users");
 var handlers = [
 	{
 		path: "/api/projects",
 		actions: {
-			GET: function() { return dataStorage.getAllProjects() || NO_DATA_FOUND; }
+			GET: function() { return dataStorage.getAllProjects() || resultCodes.noResourceFound; }
 		}
 	},
 	{
 		path: "/api/projects/:projectId",
 		actions: {
-			GET: function(params) { return dataStorage.getProjectWithId(params) || NO_DATA_FOUND; }
+			GET: function(params) { return dataStorage.getProjectWithId(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
 		path: "/api/projects/:projectId/members",
 		actions: {
-			GET: function(params) { return dataStorage.getMembersForProjectWithId(params) || NO_DATA_FOUND; }
+			GET: function(params) { return dataStorage.getMembersForProjectWithId(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
 		path: "/api/users",
 		actions: {
 			POST: function(params, data) {
+
 				// Validate input
 				if(Object.keys(data).length !== 2 || !users.validateEmail(data.email) || !users.validatePassword(data.password)) {
-					return INVALID_DATA;
+					return resultCodes.invalidData;
 				}
 
 				// Replace password by password hash
@@ -45,7 +44,20 @@ var handlers = [
 				data.activationExpiration = users.generateActivationExpiration();
 
 				// Store user data
-				return dataStorage.addUser(data) || INVALID_DATA;
+				return dataStorage.addUser(data) || resultCodes.invalidData;
+			},
+			PUT: function(params, data) {
+
+				// Validate input
+				if(Object.keys(data).length !== 1 || !data.activationToken) {
+					return resultCodes.invalidData;
+				}
+
+				// Add current time parameters
+				data.now = Date.now();
+
+				// Update user data
+				return dataStorage.activateUser(data) || resultCodes.invalidData;
 			}
 		}
 	}

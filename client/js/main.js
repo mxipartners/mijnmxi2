@@ -1,5 +1,5 @@
 // Constants
-var ACTIVATION_CODE_KEY = "activationCode";
+var ACTIVATION_CODE_KEY = "activationToken";
 var EMPTY_FUNCTION = function() {};
 
 // Globals
@@ -92,27 +92,71 @@ var app = {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
 					}
-					d3.request("/api/users")
-						.mimeType("application/json")
-						.header("Content-Type", "application/json")
-						.response(function(xhr) { return JSON.parse(xhr.responseText); })
-						.post(JSON.stringify({ email: emailValue, password: newPasswordValue }), function(error, data) {
-							console.log(error, data);
-						})
-					;
+					sendPostRequest("/api/users", { email: emailValue, password: newPasswordValue }, function(error, data) {
+						if(error) {
+							notifyError(error);
+						}
+					});
 				}
 			}
 		},
 
-		// User activation page where a (new) user can activate the requested access to the app (using a received activation code)
+		// User activation page where a (new) user can activate the requested access to the app (using a received activation token)
 		userActivation: {
-			isUserRequired: false
+			isUserRequired: false,
+			beforeShow: function(pageElement) {
+				var activationToken = getActivationTokenFromURL();
+				if(activationToken) {
+					pageElement.select("#activationTokenInput").property("value", activationToken);
+				}
+			},
+			actions: {
+				activate: function() {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var activationTokenValue = this.element.select("#activationTokenInput").property("value");
+					sendPutRequest("/api/users", { activationToken: activationTokenValue }, function(error, data) {
+						if(error) {
+							notifyError(error);
+						}
+					});
+				}
+			}
 		}
 	},
 
 	// Selections
 	selections: {}
 };
+
+// Send API request
+function sendGetRequest(url, requestData, callback) {
+	return sendAPIRequest(url, "GET", requestData, callback);
+}
+
+function sendPostRequest(url, requestData, callback) {
+	return sendAPIRequest(url, "POST", requestData, callback);
+}
+
+function sendPutRequest(url, requestData, callback) {
+	return sendAPIRequest(url, "PUT", requestData, callback);
+}
+
+function sendAPIRequest(url, method, requestData, callback) {
+	d3.request(url)
+		.mimeType("application/json")
+		.header("Content-Type", "application/json")
+		.response(function(xhr) { return JSON.parse(xhr.responseText); })
+		.send(method, JSON.stringify(requestData), function(error, responseData) {
+			console.log(error, responseData);
+			if(callback) {
+				callback(error, responseData);
+			}
+		})
+	;
+}
 
 // Show page
 function showPage(id) {
@@ -128,8 +172,10 @@ function showPage(id) {
 	if(!app.selections.user && page.isUserRequired) {
 
 		// Decide between login or activation
-		var activationCode = getActivationCodeFromURL();
-		if(activationCode) {
+		var activationToken = getActivationTokenFromURL();
+		if(activationToken) {
+			id = "userActivation";
+			page = app.pages[id];
 		} else {
 			id = "login";
 			page = app.pages[id];
@@ -295,8 +341,21 @@ function notifyInvalidForm(formElement, message) {
 	window.alert("Gegevens incorrect" + (message ? ": \"" + message + "\"" : "") + ". Maak gegevens correct en probeer opnieuw.");
 }
 
-// Answer the activation code from the URL
-function getActivationCodeFromURL() {
+// Generic notify
+function notifyError(errorOrMessage) {
+	var message = errorOrMessage;
+	if(errorOrMessage.message) {
+		// In case of Error instance
+		message = errorOrMessage.message;
+	} else if(errorOrMessage.target && errorOrMessage.target.responseText) {
+		// In case of XmlHTTPRequestProgressEvent
+		message = errorOrMessage.target.responseText;
+	}
+	window.alert(message);
+}
+
+// Answer the activation token from the URL
+function getActivationTokenFromURL() {
 	var searchParameters = getSearchParametersFromURL();
 	if(searchParameters && searchParameters[ACTIVATION_CODE_KEY] && searchParameters[ACTIVATION_CODE_KEY].length > 0) {
 		return searchParameters[ACTIVATION_CODE_KEY];

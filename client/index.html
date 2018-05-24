@@ -10,32 +10,32 @@
 	</head>
 	<body>
 		<div id="home" class="page">
-			<a class="nav" href="#projects">Projects</a>
-			<a class="nav" href="#members">Members</a>
+			<a class="nav" href="#projects">Projecten</a>
+			<a class="nav" href="#members">Deelnemers</a>
 		</div>
 		<div id="projects" class="page">
-			Projects page
+			Projecten pagina
 			<ul data-repeat="{{.}}">
 				<li>{{name}}</li>
 			</ul>
-			<a class="nav" href="#home">Back</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="members" class="page">
-			Members page
+			Deelnemers pagina
 			<ul data-repeat="{{.}}">
 				<li><span>{{name}}</span> - <span>{{email}}</span></li>
 			</ul>
-			<a class="nav" href="#home">Back</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="member", class="page">
-			Member page
+			Deelnemers pagina
 			<h1>{{name}}</h1>
 			<h3>{{shortName}}</h3>
 			<h3>{{email}}</h3>
-			<a class="nav" href="#home">Back</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="login" class="page">
-			Login page
+			Login pagina
 			<form action="">
 				<label for="loginEmailInput">Email-adres</label>
 				<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
@@ -43,10 +43,10 @@
 				<input id="loginPasswordInput" type="password" autocomplete="current-password" required>
 			</form>
 			<a class="nav" href="#userRegistration">Nieuwe gebruiker</a>
-			<a class="nav" href="#home">Back</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="userRegistration" class="page">
-			User registration page
+			Registeer nieuwe gebruiker pagina
 			<form action="">
 				<label for="registerEmailInput">Email adres</label>
 				<input id="registerEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
@@ -56,11 +56,16 @@
 				<input id="registerVerifyPasswordInput" type="password" autocomplete="new-password" required>
 			</form>
 			<a class="action" href="#register">Registreer</a>
-			<a class="nav" href="#home">Back</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="userActivation" class="page">
-			User activation page
-			<a class="nav" href="#home">Back</a>
+			Activeer gebruiker pagina
+			<form action="">
+				<label for="activationTokenInput">Activatiecode</label>
+				<input id="activationTokenInput" type="text" autocomplete="no" autofocus placeholder="Activatiecode" required>
+			</form>
+			<a class="action" href="#activate">Activeer</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 	</body>
 </html>
