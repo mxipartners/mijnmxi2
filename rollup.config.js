@@ -1,3 +1,4 @@
+import replace from 'rollup-plugin-replace';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import globals from 'rollup-plugin-node-globals';
@@ -11,10 +12,13 @@ export default {
     format: "cjs"
   },
   plugins: [
+    replace({
+      "process.env.NODE_ENV": "\"production\"",
+      "process.env.PORT": "3002"
+    }),
     resolve({
       main: true,
-      jsnext: true,
-      browser: true
+      jsnext: true
     }),
     commonjs(),
     globals(),

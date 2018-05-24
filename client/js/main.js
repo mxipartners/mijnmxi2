@@ -30,7 +30,7 @@ var app = {
 		projects: {
 			isUserRequired: true,
 			beforeShow: function(pageElement) {
-				d3.json("/api/projects", function(error, data) {
+				d3.json("api/projects", function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
@@ -48,7 +48,7 @@ var app = {
 					console.error("No project selected!");
 					return;
 				}
-				d3.json("/api/projects/" + app.selections.projectId + "/members", function(error, data) {
+				d3.json("api/projects/" + app.selections.projectId + "/members", function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
@@ -92,7 +92,7 @@ var app = {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
 					}
-					sendPostRequest("/api/users", { email: emailValue, password: newPasswordValue }, function(error, data) {
+					sendPostRequest("api/users", { email: emailValue, password: newPasswordValue }, function(error, data) {
 						if(error) {
 							notifyError(error);
 						}
@@ -117,7 +117,7 @@ var app = {
 						return;
 					}
 					var activationTokenValue = this.element.select("#activationTokenInput").property("value");
-					sendPutRequest("/api/users", { activationToken: activationTokenValue }, function(error, data) {
+					sendPutRequest("api/users", { activationToken: activationTokenValue }, function(error, data) {
 						if(error) {
 							notifyError(error);
 						}
@@ -148,7 +148,14 @@ function sendAPIRequest(url, method, requestData, callback) {
 	d3.request(url)
 		.mimeType("application/json")
 		.header("Content-Type", "application/json")
-		.response(function(xhr) { return JSON.parse(xhr.responseText); })
+		.response(function(xhr) {
+			try {
+				return JSON.parse(xhr.responseText);
+			} catch(error) {
+				console.error("Failed to parse JSON result", xhr.responseText);
+			}
+			return undefined;
+		})
 		.send(method, JSON.stringify(requestData), function(error, responseData) {
 			console.log(error, responseData);
 			if(callback) {

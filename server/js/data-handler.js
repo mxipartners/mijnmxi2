@@ -135,7 +135,7 @@ function dataHandler(request, response) {
 		response.writeHead(200, { "Content-Type": "application/json" }); 
 		response.end(JSON.stringify(responseData));
 	});
-};
+}
 
 // Match url against provided path
 // Answer a parameter object for the match found (may be empty object in case no parameters are present on url)

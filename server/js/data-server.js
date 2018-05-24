@@ -1,5 +1,5 @@
 // Constants
-var PORT = 8001;
+var PORT = process.env.PORT || 8001;
 
 // Globals
 var http = require("http");
