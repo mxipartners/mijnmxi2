@@ -7,6 +7,7 @@ var INVALID_DATA = { result: ERROR_RESULT, code: 400, message: "Bad request" };
 
 // Globals
 var dataStorage = require("./data-storage");
+var users = require("./users");
 var handlers = [
 	{
 		path: "/api/projects",
@@ -30,11 +31,20 @@ var handlers = [
 		path: "/api/users",
 		actions: {
 			POST: function(params, data) {
-
-				// Only allow a single email address with domain "mxi.nl" as valid input
-				if(Object.keys(data).length > 1 || !data.email || !/^[^\s@]+@mxi.nl$/.test(data.email)) {
+				// Validate input
+				if(Object.keys(data).length !== 2 || !users.validateEmail(data.email) || !users.validatePassword(data.password)) {
 					return INVALID_DATA;
 				}
+
+				// Replace password by password hash
+				data.passwordHash = users.generatePasswordHash(data.password);
+				delete data.password;
+
+				// Add activation token and expiration
+				data.activationToken = users.generateActivationToken();
+				data.activationExpiration = users.generateActivationExpiration();
+
+				// Store user data
 				return dataStorage.addUser(data) || INVALID_DATA;
 			}
 		}

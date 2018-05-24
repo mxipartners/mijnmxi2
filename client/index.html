@@ -37,10 +37,10 @@
 		<div id="login" class="page">
 			Login page
 			<form action="">
-				<label for="emailInput">Email-adres</label>
-				<input id="emailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
-				<label for="passwordInput">Wachtwoord</label>
-				<input id="passwordInput" type="password" autocomplete="current-password" required>
+				<label for="loginEmailInput">Email-adres</label>
+				<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+				<label for="loginPasswordInput">Wachtwoord</label>
+				<input id="loginPasswordInput" type="password" autocomplete="current-password" required>
 			</form>
 			<a class="nav" href="#userRegistration">Nieuwe gebruiker</a>
 			<a class="nav" href="#home">Back</a>
@@ -48,8 +48,12 @@
 		<div id="userRegistration" class="page">
 			User registration page
 			<form action="">
-				<label>Email adres</label>
-				<input name="email" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+				<label for="registerEmailInput">Email adres</label>
+				<input id="registerEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+				<label for="registerNewPasswordInput">Wachtwoord</label>
+				<input id="registerNewPasswordInput" type="password" autocomplete="new-password" required>
+				<label for="registerVerifyPasswordInput">Verificatie wachtwoord</label>
+				<input id="registerVerifyPasswordInput" type="password" autocomplete="new-password" required>
 			</form>
 			<a class="action" href="#register">Registreer</a>
 			<a class="nav" href="#home">Back</a>

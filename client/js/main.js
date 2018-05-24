@@ -81,15 +81,22 @@ var app = {
 			isUserRequired: false,
 			actions: {
 				register: function() {
-					if(!validateForm(this.element.select("form"), true)) {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
 						return;
 					}
-					var emailValue = this.element.select("input[name=email]").property("value");
+					var emailValue = this.element.select("#registerEmailInput").property("value");
+					var newPasswordValue = this.element.select("#registerNewPasswordInput").property("value");
+					var verifyPasswordValue = this.element.select("#registerVerifyPasswordInput").property("value");
+					if(newPasswordValue !== verifyPasswordValue) {
+						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
+						return;
+					}
 					d3.request("/api/users")
 						.mimeType("application/json")
 						.header("Content-Type", "application/json")
 						.response(function(xhr) { return JSON.parse(xhr.responseText); })
-						.post(JSON.stringify({ email: emailValue }), function(error, data) {
+						.post(JSON.stringify({ email: emailValue, password: newPasswordValue }), function(error, data) {
 							console.log(error, data);
 						})
 					;
@@ -283,9 +290,9 @@ function validateForm(formElement, doNotify) {
 }
 
 // Notify the current form is invalid
-function notifyInvalidForm(formElement) {
+function notifyInvalidForm(formElement, message) {
 	// TODO: replace with better notification (using formElement)
-	window.alert("Gegevens incorrect. Maak gegevens\ncorrect en probeer opnieuw.");
+	window.alert("Gegevens incorrect" + (message ? ": \"" + message + "\"" : "") + ". Maak gegevens correct en probeer opnieuw.");
 }
 
 // Answer the activation code from the URL

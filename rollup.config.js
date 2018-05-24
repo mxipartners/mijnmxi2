@@ -21,6 +21,11 @@ export default {
     builtins()
   ],
   external: [
-    "http"
+    "https",
+    "http",
+    "fs",
+    "crypto",
+    "bcrypt",
+    "better-sqlite3"
   ]
 };
