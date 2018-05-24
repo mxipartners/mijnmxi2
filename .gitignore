@@ -4,5 +4,6 @@ deploy/
 node_modules/
 private/
 server/db/work.db*
+server/mail-auth.json
 *.swp
 .DS_Store

@@ -6,6 +6,7 @@ var BCRYPT_HASH_SALT_ROUNDS = 10;
 // Globals
 var crypto = require("crypto");
 var bcrypt = require("bcrypt");
+var mailer = require("./mailer");
 
 // Users functions
 var users = {
@@ -38,6 +39,9 @@ var users = {
 	},
 	generateActivationExpiration: function() {
 		return Date.now() + ACTIVATION_EXPIRATION_TIMEOUT;
+	},
+	sendActivationToken: function(to, activationToken) {
+		return mailer.sendMail(to, "Uw activationtoken: " + activationToken);
 	}
 };
 

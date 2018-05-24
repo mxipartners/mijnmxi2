@@ -44,7 +44,12 @@ var handlers = [
 				data.activationExpiration = users.generateActivationExpiration();
 
 				// Store user data
-				return dataStorage.addUser(data) || resultCodes.invalidData;
+				var result = dataStorage.addUser(data);
+				if(result && result.id) {
+					// @@ send activation mail
+					users.sendActivationToken(data.email, data.activationToken);
+				}
+				return result || resultCodes.invalidData;
 			},
 			PUT: function(params, data) {
 

@@ -95,6 +95,14 @@ var app = {
 					sendPostRequest("api/users", { email: emailValue, password: newPasswordValue }, function(error, data) {
 						if(error) {
 							notifyError(error);
+						} else if(data && data.id) {
+							window.alert("Account is geregistreerd. Een mail met activatiecode is verzonden naar het opgegeven mail-adres.");
+						} else {
+							if(data && data.code === 409) {
+								window.alert("Een account met opgegeven mail-adres bestaat al.");
+							} else {
+								window.alert("Het account kon niet geregistreerd worden. Controleer de gegevens en probeer opnieuw.");
+							}
 						}
 					});
 				}
@@ -120,6 +128,12 @@ var app = {
 					sendPutRequest("api/users", { activationToken: activationTokenValue }, function(error, data) {
 						if(error) {
 							notifyError(error);
+						} else if(data && data.id === 0) {
+							window.alert("Account is succesvol geactiveerd!");
+							removeSearchParametersFromURL();
+							showPage("home");
+						} else {
+							window.alert("Account kon niet geactiveerd worden.");
 						}
 					});
 				}
@@ -399,6 +413,15 @@ function getSearchParametersFromURL() {
 	}
 
 	return parameters;
+}
+
+function removeSearchParametersFromURL() {
+	var newURL = document.location.origin + document.location.pathname;
+	if(history.pushState) {
+		history.pushState({ path: newURL }, "", newURL);
+	} else {
+		document.location.href = newURL;
+	}
 }
 
 // Start app by initialization after the page is fully loaded

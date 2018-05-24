@@ -27,7 +27,8 @@
   },
   "dependencies": {
     "bcrypt": "^2",
-    "better-sqlite3": "^4"
+    "better-sqlite3": "^4",
+    "nodemailer": "^4"
   },
   "devDependencies": {
     "eslint": "3",
