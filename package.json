@@ -39,6 +39,7 @@
     "rollup": "^1",
     "tape": "^4",
     "uglify-es": "^3",
-    "rimraf": "^2"
+    "rimraf": "^2",
+    "bl": "^0.9"
   }
 }
