@@ -2,7 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
-import json from 'rollup-plugin-json';
+import autoExternal from 'rollup-plugin-auto-external';
 
 export default {
   input: "index",
@@ -12,9 +12,7 @@ export default {
     format: "cjs"
   },
   plugins: [
-    json({
-      exclude: [ "node_modules/*" ]
-    }),
+    autoExternal(),
     resolve({
       preferBuiltins: true
     }),
