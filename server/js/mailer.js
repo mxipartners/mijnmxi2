@@ -14,7 +14,7 @@ var transport = nodemailer.createTransport({
 var mailer = {
 	sendMail: function(to, message) {
 		transport.sendMail({
-			from: "noreply@mxi.nl",
+			from: authOptions.user,
 			to: to,
 			text: message
 		}, function(error, data) {

@@ -73,7 +73,27 @@ var app = {
 
 		// Login page
 		login: {
-			isUserRequired: false
+			isUserRequired: false,
+			actions: {
+				login: function() {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var email = form.select("#loginEmailInput").property("value");
+					var password = form.select("#loginPasswordInput").property("value");
+					sendPostRequest("api/sessions", { email: email, password: password }, function(error, data) {
+						if(error) {
+							notifyError(error);
+						} else if(data && data.token) {
+							app.selections.user = email;
+							app.selections.session = data;
+						} else {
+							window.alert("De ingevoerde logingegevens kloppen niet!");
+						}
+					});
+				}
+			}
 		},
 
 		// User registration page where a new user can register to request access to the app
@@ -85,9 +105,9 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var emailValue = this.element.select("#registerEmailInput").property("value");
-					var newPasswordValue = this.element.select("#registerNewPasswordInput").property("value");
-					var verifyPasswordValue = this.element.select("#registerVerifyPasswordInput").property("value");
+					var emailValue = form.select("#registerEmailInput").property("value");
+					var newPasswordValue = form.select("#registerNewPasswordInput").property("value");
+					var verifyPasswordValue = form.select("#registerVerifyPasswordInput").property("value");
 					if(newPasswordValue !== verifyPasswordValue) {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
@@ -124,7 +144,7 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var activationTokenValue = this.element.select("#activationTokenInput").property("value");
+					var activationTokenValue = form.select("#activationTokenInput").property("value");
 					sendPutRequest("api/users", { activationToken: activationTokenValue }, function(error, data) {
 						if(error) {
 							notifyError(error);

@@ -34,6 +34,14 @@ var dataStorage = {
 		}
 		return undefined;
 	},
+	getUser: function(params) {
+		try {
+			return statements.getUser.get(params);
+		} catch(error) {
+			console.error("Retrieve user failed", error);
+		}
+		return undefined;
+	},
 	addUser: function(data) {
 		try {
 			var info = statements.addUser.run(data);
@@ -60,6 +68,18 @@ var dataStorage = {
 			console.error("Activate user failed", error);
 		}
 		return undefined;
+	},
+	addSession: function(data) {
+		try {
+			var info = statements.addSession.run(data);
+			if(info.changes !== 1) {
+				return undefined;
+			}
+			return { token: data.token };
+		} catch(error) {
+			console.error("Add session failed", error);
+		}
+		return undefined;
 	}
 };
 
@@ -70,7 +90,7 @@ db.pragma("journal_mode = WAL");
 db.exec("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, passwordHash TEXT NOT NULL, activationTimestamp INTEGER NOT NULL, activationToken TEXT, activationExpiration INTEGER, name TEXT, shortName TEXT, phoneNumber TEXT, skypeAddress TEXT)");
 db.exec("CREATE TABLE IF NOT EXISTS projects(id INTEGER PRIMARY KEY, name TEXT NOT NULL)");
 db.exec("CREATE TABLE IF NOT EXISTS members(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, projectId INTEGER NOT NULL, FOREIGN KEY (userId) REFERENCES users(id), FOREIGN KEY(projectId) REFERENCES projects(id))");
-db.exec("CREATE TABLE IF NOT EXISTS userManagement(id INTEGER PRIMARY KEY, action TEXT NOT NULL, code TEXT NOT NULL, expiration TEXT NOT NULL)");
+db.exec("CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, token TEXT NOT NULL, expiration INTEGER NOT NULL)");
 
 // Update tables (per version number)
 try {
@@ -99,11 +119,25 @@ Object.assign(statements, {
 			"INNER JOIN members ON users.id = members.userId " +
 			"WHERE projectId = :projectId"
 	),
+	getUser: db.prepare(
+		"SELECT * FROM users WHERE email = :email"
+	),
 	addUser: db.prepare(
-		"INSERT INTO users (email, passwordHash, activationTimestamp, activationToken, activationExpiration) VALUES (:email, :passwordHash, 0, :activationToken, :activationExpiration)"
+		"INSERT INTO users (email, passwordHash, activationTimestamp, activationToken, activationExpiration) " +
+			"VALUES (:email, :passwordHash, 0, :activationToken, :activationExpiration)"
 	),
 	activateUser: db.prepare(
-		"UPDATE users SET activationTimestamp = :now, activationExpiration = 0 WHERE activationToken = :activationToken AND activationExpiration >= :now AND activationTimestamp = 0"
+		"UPDATE users SET activationTimestamp = :now, activationExpiration = 0 " +
+			"WHERE activationToken = :activationToken AND activationExpiration >= :now AND activationTimestamp = 0"
+	),
+	addSession: db.prepare(
+		"INSERT INTO sessions (userId, token, expiration) VALUES (:userId, :token, :expiration)"
+	),
+	getSession: db.prepare(
+		"SELECT * FROM sessions WHERE userId = :userId AND token = :token"
+	),
+	cleanSessions: db.prepare(
+		"DELETE FROM sessions WHERE expiration < :now"
 	)
 });
 

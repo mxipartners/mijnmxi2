@@ -1,6 +1,8 @@
 // Constants
 var ACTIVATION_TOKEN_LENGTH = 32;		// bytes
 var ACTIVATION_EXPIRATION_TIMEOUT = 3600000;	// 1 hour in milliseconds
+var SESSION_TOKEN_LENGTH = 64;			// bytes
+var SESSION_EXPIRATION_TIMEOUT = 3600000;	// 1 hour in milliseconds
 var BCRYPT_HASH_SALT_ROUNDS = 10;
 
 // Globals
@@ -42,6 +44,14 @@ var users = {
 	},
 	sendActivationToken: function(to, activationToken) {
 		return mailer.sendMail(to, "Uw activationtoken: " + activationToken);
+	},
+
+	// Session functions
+	generateSessionToken: function() {
+		return crypto.randomBytes(SESSION_TOKEN_LENGTH).toString("hex");
+	},
+	generateSessionExpiration: function() {
+		return Date.now() + SESSION_EXPIRATION_TIMEOUT;
 	}
 };
 

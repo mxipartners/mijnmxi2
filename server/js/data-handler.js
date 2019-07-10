@@ -46,7 +46,7 @@ var handlers = [
 				// Store user data
 				var result = dataStorage.addUser(data);
 				if(result && result.id) {
-					// @@ send activation mail
+					// Send activation mail
 					users.sendActivationToken(data.email, data.activationToken);
 				}
 				return result || resultCodes.invalidData;
@@ -63,6 +63,38 @@ var handlers = [
 
 				// Update user data
 				return dataStorage.activateUser(data) || resultCodes.invalidData;
+			}
+		}
+	},
+	{
+		path: "/api/sessions",
+		actions: {
+			POST: function(params, data) {
+
+				// Validate input
+				if(Object.keys(data).length !== 2 || !data.email || !data.password) {
+					return resultCodes.invalidData;
+				}
+
+				// Keep password in temporary var and remove from request data
+				var password = data.password;
+				delete data.password;
+
+				// Retrieve user
+				var user = dataStorage.getUser(data);
+				if(!user || !users.comparePasswordHash(password, user.passwordHash)) {
+					return resultCodes.invalidData;
+				}
+
+				// Create session with user id, token and expiration
+				var session = {
+					userId: user.id,
+					token: users.generateSessionToken(),
+					expiration: users.generateSessionExpiration()
+				};
+
+				// Store session data
+				return dataStorage.addSession(session) || resultCodes.invalidData;
 			}
 		}
 	}
