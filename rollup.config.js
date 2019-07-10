@@ -17,10 +17,11 @@ export default {
       "process.env.PORT": "3002"
     }),
     resolve({
-      main: true,
-      jsnext: true
+      preferBuiltins: true
     }),
-    commonjs(),
+    commonjs({
+      ignore: [ "conditional-runtime-dependency" ]
+    }),
     globals(),
     builtins()
   ],
