@@ -13,6 +13,10 @@ export default {
     format: "cjs"
   },
   plugins: [
+    replace({
+      "process.env.NODE_ENV": "\"production\"",
+      "process.env.PORT": "3002"
+    }),
     json({
       exclude: [ "node_modules/*" ]
     }),
