@@ -3,10 +3,16 @@ var resultCodes = require("./result-codes");
 var Database = require("better-sqlite3");
 var db = new Database("server/db/work.db");
 var statements = {};
+
+// Data storage defines the storage operations
+// The retrieval operations (operations named getXyz) receive (optional) input parameters which specify which data to retrieve.
+// The insert operations (operations named addXyz) receive data to specify what to store.
+// The update operations (operations named updateXyz, but also for example activateUser) receive data to specify what to update.
+// The delete operations (operations named deleteXyz) receive (optional) input parameters which specify which data to delete.
 var dataStorage = {
 	getAllProjects: function(/* params */) {
 		try {
-			return statements.getAllProjects.all()
+			return statements.getAllProjects.all();
 		} catch(error) {
 			console.error("Retrieve all projects failed", error);
 		}
@@ -63,7 +69,7 @@ var dataStorage = {
 			if(info.changes !== 1) {
 				return resultCodes.noResourceFound;
 			}
-			return { id: 0 }
+			return { success: true };
 		} catch(error) {
 			console.error("Activate user failed", error);
 		}
@@ -80,6 +86,27 @@ var dataStorage = {
 			console.error("Add session failed", error);
 		}
 		return undefined;
+	},
+	updateSession: function(params, data) {
+		try {
+			var info = statements.updateSession.run(data);
+			if(info.changes !== 1) {
+				return resultCodes.noResourceFound;
+			}
+			return { success: true };
+		} catch(error) {
+			console.error("Update session failed", error);
+		}
+		return undefined;
+	},
+	deleteSessions: function(params, data) {
+		try {
+			var info = statements.deleteSessions.run(data);
+			return { count: info.changes };
+		} catch(error) {
+			console.error("Activate user failed", error);
+		}
+		return undefined;
 	}
 };
 
@@ -90,7 +117,7 @@ db.pragma("journal_mode = WAL");
 db.exec("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, passwordHash TEXT NOT NULL, activationTimestamp INTEGER NOT NULL, activationToken TEXT, activationExpiration INTEGER, name TEXT, shortName TEXT, phoneNumber TEXT, skypeAddress TEXT)");
 db.exec("CREATE TABLE IF NOT EXISTS projects(id INTEGER PRIMARY KEY, name TEXT NOT NULL)");
 db.exec("CREATE TABLE IF NOT EXISTS members(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, projectId INTEGER NOT NULL, FOREIGN KEY (userId) REFERENCES users(id), FOREIGN KEY(projectId) REFERENCES projects(id))");
-db.exec("CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, token TEXT NOT NULL, expiration INTEGER NOT NULL)");
+db.exec("CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, token TEXT UNIQUE NOT NULL, expiration INTEGER NOT NULL)");
 
 // Update tables (per version number)
 try {
@@ -133,10 +160,10 @@ Object.assign(statements, {
 	addSession: db.prepare(
 		"INSERT INTO sessions (userId, token, expiration) VALUES (:userId, :token, :expiration)"
 	),
-	getSession: db.prepare(
-		"SELECT * FROM sessions WHERE userId = :userId AND token = :token"
+	updateSession: db.prepare(
+		"UPDATE sessions SET expiration = :expiration WHERE token = :token AND expiration >= :now"
 	),
-	cleanSessions: db.prepare(
+	deleteSessions: db.prepare(
 		"DELETE FROM sessions WHERE expiration < :now"
 	)
 });

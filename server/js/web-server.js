@@ -5,7 +5,6 @@ var PORT = 8080;
 var https = require("https");
 var http = require("http");
 var fs = require("fs");
-var path = require("path");
 var dataServer = require("./data-server");
 
 // Content types for responses
@@ -26,8 +25,8 @@ var webServer = null;
 if(process.env.NODE_ENV !== "production") {
 
 	var webServerOptions = {
-		key: fs.readFileSync(path.join(__dirname, "..", "..", "private", "cert", "server", "privkey.pem")),
-		cert: fs.readFileSync(path.join(__dirname, "..", "..", "private", "cert", "server", "fullchain.pem"))
+		key: fs.readFileSync("private/cert/server/privkey.pem"),
+		cert: fs.readFileSync("private/cert/server/fullchain.pem")
 	};
 	webServer = https.createServer(webServerOptions, function(request, response) {
 

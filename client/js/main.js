@@ -30,7 +30,7 @@ var app = {
 		projects: {
 			isUserRequired: true,
 			beforeShow: function(pageElement) {
-				d3.json("api/projects", function(error, data) {
+				sendGetRequest("api/projects", function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
@@ -48,7 +48,7 @@ var app = {
 					console.error("No project selected!");
 					return;
 				}
-				d3.json("api/projects/" + app.selections.projectId + "/members", function(error, data) {
+				sendGetRequest("api/projects/" + app.selections.projectId + "/members", function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
@@ -88,6 +88,7 @@ var app = {
 						} else if(data && data.token) {
 							app.selections.user = email;
 							app.selections.session = data;
+							showPage("home");
 						} else {
 							window.alert("De ingevoerde logingegevens kloppen niet!");
 						}
@@ -148,7 +149,7 @@ var app = {
 					sendPutRequest("api/users", { activationToken: activationTokenValue }, function(error, data) {
 						if(error) {
 							notifyError(error);
-						} else if(data && data.id === 0) {
+						} else if(data && data.success) {
 							window.alert("Account is succesvol geactiveerd!");
 							removeSearchParametersFromURL();
 							showPage("home");
@@ -166,8 +167,8 @@ var app = {
 };
 
 // Send API request
-function sendGetRequest(url, requestData, callback) {
-	return sendAPIRequest(url, "GET", requestData, callback);
+function sendGetRequest(url, callback) {
+	return sendAPIRequest(url, "GET", null, callback);
 }
 
 function sendPostRequest(url, requestData, callback) {
@@ -178,10 +179,19 @@ function sendPutRequest(url, requestData, callback) {
 	return sendAPIRequest(url, "PUT", requestData, callback);
 }
 
+function sendDeleteRequest(url, requestData, callback) {
+	return sendAPIRequest(url, "DELETE", requestData, callback);
+}
+
 function sendAPIRequest(url, method, requestData, callback) {
+	var sessionToken = "";
+	if(app.selections.session) {
+		sessionToken =  app.selections.session.token || null;
+	}
 	d3.request(url)
 		.mimeType("application/json")
 		.header("Content-Type", "application/json")
+		.header("X-Session-Token", sessionToken)
 		.response(function(xhr) {
 			try {
 				return JSON.parse(xhr.responseText);
@@ -190,8 +200,7 @@ function sendAPIRequest(url, method, requestData, callback) {
 			}
 			return undefined;
 		})
-		.send(method, JSON.stringify(requestData), function(error, responseData) {
-			console.log(error, responseData);
+		.send(method, requestData === null ? null : JSON.stringify(requestData), function(error, responseData) {
 			if(callback) {
 				callback(error, responseData);
 			}

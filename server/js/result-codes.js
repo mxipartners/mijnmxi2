@@ -1,6 +1,6 @@
 // Globals
 var resultCodes = {
-	noResourceFound: { code: 200, message: "No resource found" },
+	noResourceFound: { code: 404, message: "Resource not found" },
 	invalidData: { code: 400, message: "Bad request" },
 	uniqueConstraintViolation: { code: 409, message: "Conflict" }
 };

@@ -6,26 +6,33 @@ var LEADING_PATH_SEPARATORS_REGEX = /^\/+/;
 var resultCodes = require("./result-codes");
 var dataStorage = require("./data-storage");
 var users = require("./users");
+
+// Handlers defines a mapping between the combination of API URL & HTTP method and a function performing the API operation
+// Handler functions should answer a HTTP response code and (optionally) response content. See the file "./result-codes.js".
 var handlers = [
 	{
+		isSessionRequired: true,
 		path: "/api/projects",
 		actions: {
-			GET: function() { return dataStorage.getAllProjects() || resultCodes.noResourceFound; }
+			GET: function(/* params */) { return dataStorage.getAllProjects() || resultCodes.noResourceFound; }
 		}
 	},
 	{
+		isSessionRequired: true,
 		path: "/api/projects/:projectId",
 		actions: {
 			GET: function(params) { return dataStorage.getProjectWithId(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
+		isSessionRequired: true,
 		path: "/api/projects/:projectId/members",
 		actions: {
 			GET: function(params) { return dataStorage.getMembersForProjectWithId(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
+		isSessionRequired: false,
 		path: "/api/users",
 		actions: {
 			POST: function(params, data) {
@@ -67,6 +74,7 @@ var handlers = [
 		}
 	},
 	{
+		isSessionRequired: false,
 		path: "/api/sessions",
 		actions: {
 			POST: function(params, data) {
@@ -95,6 +103,10 @@ var handlers = [
 
 				// Store session data
 				return dataStorage.addSession(session) || resultCodes.invalidData;
+			},
+			DELETE: function(/* params */) {
+				var params = { now: Date.now() };
+				return dataStorage.deleteSessions(params) || resultCodes.invalidData;
 			}
 		}
 	}
@@ -105,7 +117,7 @@ function dataHandler(request, response) {
 	var url = request.url;
 	console.log("Handling " + request.method + " request " + url);
 
-	// Find (first) matching handler (using array.reduce)
+	// Find (first) matching handler (using array.reduce) without considering the HTTP method
 	var matchResult = handlers.reduce(function(result, handler) {
 
 		// If already have a result, answer it
@@ -137,7 +149,7 @@ function dataHandler(request, response) {
 		return;
 	}
 
-	// Check presence of correct handler action
+	// Check presence of correct handler action considering the HTTP method requested
 	var action = matchResult.handler.actions[request.method];
 	if(!action) {
 
@@ -145,6 +157,32 @@ function dataHandler(request, response) {
 		response.writeHead(405);
 		response.end("Method not allowed");
 		return;
+	}
+
+	// Check if session is required (and present)
+	if(matchResult.handler.isSessionRequired) {
+		var isValidSession = false;
+		var sessionToken = request.headers["x-session-token"];
+		if(sessionToken) {
+			var updateSessionData = {
+				token: sessionToken,
+				now: Date.now(),
+				expiration: users.generateSessionExpiration()
+			};
+			var updateSessionResult = dataStorage.updateSession(null, updateSessionData);
+			if(updateSessionResult && updateSessionResult.success) {
+
+				// Only after successful update it is clear that session is valid (do not optimize this code, it will lower the understandability)
+				isValidSession = true;
+			}
+		}
+
+		// If no valid session, fail
+		if(!isValidSession) {
+			response.writeHead(401);
+			response.end("Unauthorized");
+			return;
+		}
 	}
 
 	// Collect request data and perform handler action
@@ -158,7 +196,7 @@ function dataHandler(request, response) {
 			return;
 		}
 
-		// Perform handler action
+		// Perform handler action (send both params and data, although later can be empty or null)
 		var responseData = action.call(null, matchResult.params, requestData);
 		if(!responseData) {
 
@@ -256,7 +294,12 @@ function withRequestDataDo(request, callback) {
 		var data = "";
 		request.on("data", function(chunk) { data += chunk; });
 		request.on("end", function() {
-			callback(null, JSON.parse(data));
+			try {
+				var parsedData = data.length > 0 ? JSON.parse(data) : null;
+				callback(null, parsedData);
+			} catch(error) {
+				callback(error, null);
+			}
 		});
 		request.on("error", function(error) {
 			callback(error, null);
