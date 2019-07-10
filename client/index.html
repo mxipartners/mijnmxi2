@@ -15,23 +15,23 @@
 		</div>
 		<div id="projects" class="page">
 			Projects page
-			<ul data-repeat="{{.}}">
-				<li>{{name}}</li>
+			<ul data-repeat="{{d}}">
+				<li>{{d.name}}</li>
 			</ul>
 			<a class="nav" href="#home">Back</a>
 		</div>
 		<div id="members" class="page">
 			Members page
-			<ul data-repeat="{{.}}">
-				<li><span>{{name}}</span> - <span>{{email}}</span></li>
+			<ul data-repeat="{{d}}">
+				<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
 			</ul>
 			<a class="nav" href="#home">Back</a>
 		</div>
 		<div id="member", class="page">
 			Member page
-			<h1>{{name}}</h1>
-			<h3>{{shortName}}</h3>
-			<h3>{{email}}</h3>
+			<h1>{{d.name}}</h1>
+			<h3>{{d.shortName}}</h3>
+			<h3>{{d.email}}</h3>
 			<a class="nav" href="#home">Back</a>
 		</div>
 	</body>

@@ -23,23 +23,22 @@
   "scripts": {
     "pretest": "rimraf build && mkdir build && rollup -c",
     "test": "tape 'server/test/**/*-test.js' && eslint server/js server/test",
-    "prepublish": "npm run test && uglifyjs build/servers.js -c -m -o build/servers.min.js"
+    "prepublishOnly": "npm run test && uglifyjs build/servers.js -c -m -o build/servers.min.js"
   },
   "dependencies": {
     "better-sqlite3": "^4"
   },
   "devDependencies": {
-    "eslint": "3",
-    "nyc": "^11.4.1",
-    "rollup-plugin-node-resolve": "^3",
-    "rollup-plugin-commonjs": "^8",
+    "eslint": "^5",
+    "acorn": "^6",
+    "nyc": "^14",
+    "rollup-plugin-node-resolve": "^5",
+    "rollup-plugin-commonjs": "^10",
     "rollup-plugin-node-globals": "^1",
     "rollup-plugin-node-builtins": "^2",
-    "rollup": "^0",
-    "tape": "4",
-    "uglify-js": "^2.8.11",
-    "node-es-module-loader": "^0.3",
-    "nodemon": "^1",
+    "rollup": "^1",
+    "tape": "^4",
+    "uglify-es": "^3",
     "rimraf": "^2"
   }
 }

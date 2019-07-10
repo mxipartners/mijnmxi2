@@ -12,11 +12,11 @@ export default {
   },
   plugins: [
     resolve({
-      main: true,
-      jsnext: true,
-      browser: true
+      preferBuiltins: true
     }),
-    commonjs(),
+    commonjs({
+      ignore: [ "conditional-runtime-dependency" ]
+    }),
     globals(),
     builtins()
   ],

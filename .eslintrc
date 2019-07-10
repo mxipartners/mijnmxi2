@@ -9,3 +9,4 @@ extends:
 
 rules:
     "no-console": 0
+    "allowArrowFunctions": true
