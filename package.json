@@ -39,6 +39,7 @@
     "rollup-plugin-commonjs": "^10",
     "rollup-plugin-node-globals": "^1",
     "rollup-plugin-node-builtins": "^2",
+    "rollup-plugin-auto-external": "^2",
     "rollup-plugin-json": "^4",
     "rollup": "^1",
     "tape": "^4",
