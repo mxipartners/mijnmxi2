@@ -2,6 +2,6 @@ bin/
 build/
 node_modules/
 private/
-server/db/work.db
+server/db/work.db*
 *.swp
 .DS_Store
