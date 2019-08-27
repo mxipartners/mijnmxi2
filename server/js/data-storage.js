@@ -48,6 +48,14 @@ var dataStorage = {
 		}
 		return undefined;
 	},
+	getPassword: function(params) {
+		try {
+			return statements.getPassword.get(params);
+		} catch(error) {
+			console.error("Retrieve password failed", error);
+		}
+		return undefined;
+	},
 	addUser: function(data) {
 		try {
 			var info = statements.addUser.run(data);
@@ -192,7 +200,10 @@ Object.assign(statements, {
 			"WHERE projectId = :projectId"
 	),
 	getUser: db.prepare(
-		"SELECT * FROM users WHERE email = :email"
+		"SELECT id, email, phoneNumber, skypeAddress FROM users WHERE email = :email"
+	),
+	getPassword: db.prepare(
+		"SELECT id, passwordHash FROM users WHERE email = :email"
 	),
 	addUser: db.prepare(
 		"INSERT INTO users (email, passwordHash, activationTimestamp, activationToken, activationExpiration) " +
