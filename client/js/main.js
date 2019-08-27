@@ -453,6 +453,7 @@ function initializeAfterLoad() {
 	});
 
 	// Create templates from pages
+	d3.selectAll("#templates > *").template();
 	d3.selectAll(".page").template();
 
 	// Show home page

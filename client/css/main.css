@@ -9,14 +9,20 @@ html, body {
 	margin: 0;
 	width: 100%;
 	height: 100%;
-	background-color: #fff;
-	color: #333;
+
+	/* Set default colors and font */
+	background-color: #4a5c68;
+	color: #666666;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 body {
-	font-family: sans-serif;
 	-webkit-text-size-adjust: 100%;
 	overflow: hidden;
+}
+
+#templates {
+	display: none;
 }
 
 .page {
@@ -31,10 +37,27 @@ body {
 	cursor: pointer;
 }
 
+.button-row {
+	display: flex;
+	flex-direction: row;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.button-row img {
+	flex: auto;
+	height: 2.5em;
+}
+
 input {
-	border-style: solid;
-	border-width: 1px;
-	border-color: #333;
+	border: none;
+	border-radius: 0px;
+	padding: 10px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: #fff;
+	background-color: #66757e;
 	box-shadow: none;
 }
 
@@ -65,4 +88,23 @@ a.action {
 	border: 1px solid #333;
 	border-radius: 4px;
 	padding: 0.3em;
+}
+
+/* Prevent 'glow' on input elements on Safari */
+*:focus {
+	outline: none;
+}
+
+/* Placeholder color forced */
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #bbb;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #bbb;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #bbb;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #bbb;
 }
