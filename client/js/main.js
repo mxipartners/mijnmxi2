@@ -72,6 +72,24 @@ var app = {
 			}
 		},
 
+		//Profile page to edit personal details
+		profile: {
+			isUserRequired: true,
+			beforeShow: function(pageElement) {
+				if(!app.selections.user) {
+					console.error("No user selected!");
+					return;
+				}
+				sendGetRequest("api/users/" + app.selections.user, function(error, data) {
+					if(error) {
+						console.error(error);
+					} else if(data) {
+						pageElement.render(data);
+					}
+				});
+			}
+		},
+
 		// Login page
 		login: {
 			isUserRequired: false,
