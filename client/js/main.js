@@ -118,6 +118,12 @@ var app = {
 							window.alert("De ingevoerde logingegevens kloppen niet!");
 						}
 					});
+				},
+				userRegistration: function() {
+					showPage("userRegistration");
+				},
+				passwordForgotten: function() {
+					showPage("passwordForgotten");
 				}
 			}
 		},

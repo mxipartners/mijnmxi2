@@ -37,6 +37,46 @@ body {
 	cursor: pointer;
 }
 
+#login .logo {
+	display: flex;
+	flex-direction: row;
+}
+
+#login .logo img {
+	flex: auto;
+	height: 70%;
+	max-height: 20em;
+}
+
+#login .credentials {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#login .credentials .entry {
+	flex: 3 1 auto;
+}
+
+#login .credentials .action {
+	width: 2.5em;
+	height: 2.5em;
+	margin-left: 1em;
+}
+
+#login .credentials input {
+	display: block;
+	width: 90%;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+#login .button-row {
+}
+
 .button-row {
 	display: flex;
 	flex-direction: row;
@@ -59,6 +99,10 @@ input {
 	color: #fff;
 	background-color: #66757e;
 	box-shadow: none;
+}
+
+input[type="password"] {
+	text-overflow: clip;
 }
 
 input:required + span.required::after {
@@ -85,9 +129,25 @@ a.nav {
 
 a.action {
 	display: inline-block;
+/*
 	border: 1px solid #333;
 	border-radius: 4px;
 	padding: 0.3em;
+*/
+}
+
+/* Display a block (div) bordered (yellow/orange) */
+.border {
+	border-width: 2px;
+	border-color: #ffcf00;
+	border-style: solid;
+	border-radius: 10px;
+	padding: 5px;
+	background-color: #66757e;
+}
+
+.border input:not(:last-child) {
+	border-bottom: 1px #FFFFFF solid;
 }
 
 /* Prevent 'glow' on input elements on Safari */
