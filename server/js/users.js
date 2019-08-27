@@ -1,8 +1,10 @@
 // Constants
-var ACTIVATION_TOKEN_LENGTH = 32;		// bytes
-var ACTIVATION_EXPIRATION_TIMEOUT = 3600000;	// 1 hour in milliseconds
-var SESSION_TOKEN_LENGTH = 64;			// bytes
-var SESSION_EXPIRATION_TIMEOUT = 3600000;	// 1 hour in milliseconds
+var ACTIVATION_TOKEN_LENGTH = 32;			// bytes
+var ACTIVATION_EXPIRATION_TIMEOUT = 3600000;		// 1 hour in milliseconds
+var SESSION_TOKEN_LENGTH = 64;				// bytes
+var SESSION_EXPIRATION_TIMEOUT = 3600000;		// 1 hour in milliseconds
+var PASSWORD_RESET_TOKEN_LENGTH = 64;			// bytes
+var PASSWORD_RESET_EXPIRATION_TIMEOUT = 3600000;	// 1 hour in milliseconds
 var BCRYPT_HASH_SALT_ROUNDS = 10;
 
 // Globals
@@ -44,6 +46,17 @@ var users = {
 	},
 	sendActivationToken: function(to, activationToken) {
 		return mailer.sendMail(to, "Uw activationtoken: " + activationToken);
+	},
+
+	// Password reset functions
+	generatePasswordResetToken: function() {
+		return crypto.randomBytes(PASSWORD_RESET_TOKEN_LENGTH).toString("hex");
+	},
+	generatePasswordResetExpiration: function() {
+		return Date.now() + PASSWORD_RESET_EXPIRATION_TIMEOUT;
+	},
+	sendPasswordResetToken: function(to, passwordResetToken) {
+		return mailer.sendMail(to, "Uw wachtwoordherstelcode: " + passwordResetToken);
 	},
 
 	// Session functions

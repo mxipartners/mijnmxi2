@@ -1,8 +1,8 @@
-insert into users(name, shortName, email) values("Sari van Veenendaal", "Sari", "sari@voetbal.nl");
-insert into users(name, shortName, email) values("Stefani van der Gragt", "Stefani", "stefani@voetbal.nl");
-insert into users(name, shortName, email) values("Dominique Bloodworth", "Dominique", "dominique@voetbal.nl");
-insert into users(name, shortName, email) values("Daniëlle van de Donk", "Daniëlle", "danielle@voetbal.nl");
-insert into users(name, shortName, email) values("Jill Roord", "Jill", "jill@voetbal.nl");
+insert into users(name, shortName, email, passwordHash, activationTimestamp) values("Sari van Veenendaal", "Sari", "sari@voetbal.nl", "fake", 1562771380672);
+insert into users(name, shortName, email, passwordHash, activationTimestamp) values("Stefani van der Gragt", "Stefani", "stefani@voetbal.nl", "fake", 1562771380672);
+insert into users(name, shortName, email, passwordHash, activationTimestamp) values("Dominique Bloodworth", "Dominique", "dominique@voetbal.nl", "fake", 1562771380672);
+insert into users(name, shortName, email, passwordHash, activationTimestamp) values("Daniëlle van de Donk", "Daniëlle", "danielle@voetbal.nl", "fake", 1562771380672);
+insert into users(name, shortName, email, passwordHash, activationTimestamp) values("Jill Roord", "Jill", "jill@voetbal.nl", "fake", 1562771380672);
 insert into projects(name) values("WK 2019");
 insert into projects(name) values("OS 2020");
 insert into projects(name) values("WK 2021");

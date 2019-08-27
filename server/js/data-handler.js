@@ -7,7 +7,7 @@ var resultCodes = require("./result-codes");
 var dataStorage = require("./data-storage");
 var users = require("./users");
 
-// Handlers defines a mapping between the combination of API URL & HTTP method and a function performing the API operation
+// Handlers defines a mapping between the combination of API URL & HTTP method and a function performing the API operation.
 // Handler functions should answer a HTTP response code and (optionally) response content. See the file "./result-codes.js".
 var handlers = [
 	{
@@ -21,14 +21,14 @@ var handlers = [
 		isSessionRequired: true,
 		path: "/api/projects/:projectId",
 		actions: {
-			GET: function(params) { return dataStorage.getProjectWithId(params) || resultCodes.noResourceFound; }
+			GET: function(params) { return dataStorage.getProject(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
 		isSessionRequired: true,
 		path: "/api/projects/:projectId/members",
 		actions: {
-			GET: function(params) { return dataStorage.getMembersForProjectWithId(params) || resultCodes.noResourceFound; }
+			GET: function(params) { return dataStorage.getMembersForProject(params) || resultCodes.noResourceFound; }
 		}
 	},
 	{
@@ -53,23 +53,71 @@ var handlers = [
 				// Store user data
 				var result = dataStorage.addUser(data);
 				if(result && result.id) {
+
 					// Send activation mail
 					users.sendActivationToken(data.email, data.activationToken);
 				}
 				return result || resultCodes.invalidData;
 			},
-			PUT: function(params, data) {
+			PATCH: function(params, data) {
 
 				// Validate input
-				if(Object.keys(data).length !== 1 || !data.activationToken) {
+				if(!data || !data.operation) {
 					return resultCodes.invalidData;
 				}
 
-				// Add current time parameters
-				data.now = Date.now();
+				// Distinguish between operations
+				if(data.operation === "activate") {
 
-				// Update user data
-				return dataStorage.activateUser(data) || resultCodes.invalidData;
+					// Validate input
+					delete data.operation;
+					if(Object.keys(data).length !== 1 || !data.activationToken) {
+						return resultCodes.invalidData;
+					}
+
+					// Add current time parameters
+					data.now = Date.now();
+
+					// Update user data
+					return dataStorage.activateUser(data) || resultCodes.invalidData;
+				} else if(data.operation === "passwordForgotten") {
+
+					// Validate input
+					delete data.operation;
+					if(Object.keys(data).length !== 1 || !users.validateEmail(data.email)) {
+						return resultCodes.invalidData;
+					}
+
+					// Add password reset token and expiration
+					data.passwordResetToken = users.generatePasswordResetToken();
+					data.passwordResetExpiration = users.generatePasswordResetExpiration();
+
+					// Update user data
+					var result = dataStorage.passwordForgotten(data);
+					if(result && result.success) {
+
+						// Send password reset mail
+						users.sendPasswordResetToken(data.email, data.passwordResetToken);
+					}
+					return result || resultCodes.invalidData;
+				} else if(data.operation === "resetPassword") {
+
+					// Validate input
+					delete data.operation;
+					if(Object.keys(data).length !== 2 || !data.passwordResetToken || !users.validatePassword(data.password)) {
+						return resultCodes.invalidData;
+					}
+
+					// Replace password by password hash
+					data.passwordHash = users.generatePasswordHash(data.password);
+					delete data.password;
+
+					// Add current time parameters
+					data.now = Date.now();
+
+					// Update user data
+					return dataStorage.resetPassword(data) || resultCodes.invalidData;
+				}
 			}
 		}
 	},
@@ -108,6 +156,13 @@ var handlers = [
 				var params = { now: Date.now() };
 				return dataStorage.deleteSessions(params) || resultCodes.invalidData;
 			}
+		}
+	},
+	{
+		isSessionRequired: true,
+		path: "/api/sessions/:sessionToken",
+		actions: {
+			DELETE: function(params) { return dataStorage.deleteSession(params) || resultCodes.invalidData; }
 		}
 	}
 ];

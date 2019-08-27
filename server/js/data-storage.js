@@ -18,19 +18,19 @@ var dataStorage = {
 		}
 		return undefined;
 	},
-	getProjectWithId: function(params) {
+	getProject: function(params) {
 		try {
-			return statements.getProjectWithId.get(params);
+			return statements.getProject.get(params);
 		} catch(error) {
 			console.error("Retrieve project failed", error);
 		}
 		return undefined;
 	},
-	getMembersForProjectWithId: function(params) {
+	getMembersForProject: function(params) {
 		// A project has at least 1 member (the owner)
 		// If no member is found, it means the project was not found and therefore 'undefined' (ie no data found) is answered.
 		try {
-			var members = statements.getMembersForProjectWithId.all(params);
+			var members = statements.getMembersForProject.all(params);
 			if(members.length === 0) {
 				return undefined;
 			}
@@ -75,6 +75,42 @@ var dataStorage = {
 		}
 		return undefined;
 	},
+	changePassword: function(data) {
+		try {
+			var info = statements.changePassword.run(data);
+			if(info.changes !== 1) {
+				return resultCodes.invalidData; // Do not leak information about user record existance
+			}
+			return { success: true };
+		} catch(error) {
+			console.error("Change password failed", error);
+		}
+		return undefined;
+	},
+	passwordForgotten: function(data) {
+		try {
+			var info = statements.passwordForgotten.run(data);
+			if(info.changes !== 1) {
+				return resultCodes.noResourceFound;	// This does not leak information because it does not reference email
+			}
+			return { success: true };
+		} catch(error) {
+			console.error("Password forgotten failed", error);
+		}
+		return undefined;
+	},
+	resetPassword: function(data) {
+		try {
+			var info = statements.resetPassword.run(data);
+			if(info.changes !== 1) {
+				return resultCodes.noResourceFound;	// This does not leak information because it does not reference email
+			}
+			return { success: true };
+		} catch(error) {
+			console.error("Reset password failed", error);
+		}
+		return undefined;
+	},
 	addSession: function(data) {
 		try {
 			var info = statements.addSession.run(data);
@@ -99,6 +135,15 @@ var dataStorage = {
 		}
 		return undefined;
 	},
+	deleteSession: function(params) {
+		try {
+			var info = statements.deleteSession.run(params);
+			return { success: info.changes === 1 };
+		} catch(error) {
+			console.error("Delete session failed", error);
+		}
+		return undefined;
+	},
 	deleteSessions: function(params, data) {
 		try {
 			var info = statements.deleteSessions.run(data);
@@ -114,7 +159,7 @@ var dataStorage = {
 db.pragma("journal_mode = WAL");
 
 // Create tables (if they do not exist)
-db.exec("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, passwordHash TEXT NOT NULL, activationTimestamp INTEGER NOT NULL, activationToken TEXT, activationExpiration INTEGER, name TEXT, shortName TEXT, phoneNumber TEXT, skypeAddress TEXT)");
+db.exec("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL, passwordHash TEXT NOT NULL, activationTimestamp INTEGER NOT NULL, activationToken TEXT, activationExpiration INTEGER, passwordResetToken TEXT, passwordResetExpiration INTEGER, name TEXT, shortName TEXT, phoneNumber TEXT, skypeAddress TEXT)");
 db.exec("CREATE TABLE IF NOT EXISTS projects(id INTEGER PRIMARY KEY, name TEXT NOT NULL)");
 db.exec("CREATE TABLE IF NOT EXISTS members(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, projectId INTEGER NOT NULL, FOREIGN KEY (userId) REFERENCES users(id), FOREIGN KEY(projectId) REFERENCES projects(id))");
 db.exec("CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY, userId INTEGER NOT NULL, token TEXT UNIQUE NOT NULL, expiration INTEGER NOT NULL)");
@@ -138,10 +183,10 @@ Object.assign(statements, {
 	getAllProjects: db.prepare(
 		"SELECT * FROM projects"
 	),
-	getProjectWithId: db.prepare(
+	getProject: db.prepare(
 		"SELECT * FROM projects WHERE id = :projectId"
 	),
-	getMembersForProjectWithId: db.prepare(
+	getMembersForProject: db.prepare(
 		"SELECT users.id, name, shortName, email FROM users " +
 			"INNER JOIN members ON users.id = members.userId " +
 			"WHERE projectId = :projectId"
@@ -157,11 +202,26 @@ Object.assign(statements, {
 		"UPDATE users SET activationTimestamp = :now, activationExpiration = 0 " +
 			"WHERE activationToken = :activationToken AND activationExpiration >= :now AND activationTimestamp = 0"
 	),
+	changePassword: db.prepare(
+		"UPDATE users SET passwordHash = :newPasswordHash " +
+			"WHERE email = :email AND passwordHash = :oldPasswordHash"
+	),
+	passwordForgotten: db.prepare(
+		"UPDATE users SET passwordResetToken = :passwordResetToken, passwordResetExpiration = :passwordResetExpiration " +
+			"WHERE email = :email"
+	),
+	resetPassword: db.prepare(
+		"UPDATE users SET passwordHash = :passwordHash " +
+			"WHERE passwordResetToken = :passwordResetToken AND passwordResetExpiration >= :now"
+	),
 	addSession: db.prepare(
 		"INSERT INTO sessions (userId, token, expiration) VALUES (:userId, :token, :expiration)"
 	),
 	updateSession: db.prepare(
 		"UPDATE sessions SET expiration = :expiration WHERE token = :token AND expiration >= :now"
+	),
+	deleteSession: db.prepare(
+		"DELETE FROM sessions WHERE token = :sessionToken"
 	),
 	deleteSessions: db.prepare(
 		"DELETE FROM sessions WHERE expiration < :now"

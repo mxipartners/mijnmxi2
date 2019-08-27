@@ -1,5 +1,6 @@
 // Constants
 var ACTIVATION_CODE_KEY = "activationToken";
+var PASSWORD_RESET_CODE_KEY = "passwordResetToken";
 var EMPTY_FUNCTION = function() {};
 
 // Globals
@@ -87,10 +88,89 @@ var app = {
 							notifyError(error);
 						} else if(data && data.token) {
 							app.selections.user = email;
-							app.selections.session = data;
+							app.session = data;
 							showPage("home");
 						} else {
 							window.alert("De ingevoerde logingegevens kloppen niet!");
+						}
+					});
+				}
+			}
+		},
+
+		// Logout page
+		logout: {
+			isUserRequired: true,
+			beforeShow: function(pageElement) {
+				// Remove all but session token from session state
+				var sessionToken = app.session.token;
+				app.selections = { session: { token: sessionToken } };
+				sendDeleteRequest("api/sessions/" + sessionToken, function(error, data) {
+					if(error) {
+						console.error(error);
+					} else if(data) {
+						console.log("Delete session success: " + data.success);
+					}
+				});
+			}
+		},
+
+		// Password forgotten page
+		passwordForgotten: {
+			isUserRequired: false,
+			actions: {
+				passwordForgotten: function() {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var email = form.select("#loginEmailInput").property("value");
+					sendPatchRequest("api/users", { operation: "passwordForgotten", email: email }, function(error, data) {
+						if(error) {
+							notifyError(error);
+						} else if(data && data.success) {
+							window.alert("Een mail is verzonden met uw wachtwoordherstelcode!");
+							removeSearchParametersFromURL();
+							showPage("resetPassword");
+						} else {
+							window.alert("Account kon niet geactiveerd worden.");
+						}
+					});
+				}
+			}
+		},
+
+		// Reset password page
+		resetPassword: {
+			isUserRequired: false,
+			beforeShow: function(pageElement) {
+				var passwordResetToken = getPasswordResetTokenFromURL();
+				if(passwordResetToken) {
+					pageElement.select("#passwordResetTokenInput").property("value", passwordResetToken);
+				}
+			},
+			actions: {
+				resetPassword: function() {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var passwordResetToken = form.select("#passwordResetTokenInput").property("value");
+					var newPassword = form.select("#passwordInput").property("value");
+					var verifyPassword = form.select("#verifyPasswordInput").property("value");
+					if(newPassword !== verifyPassword) {
+						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
+						return;
+					}
+					sendPatchRequest("api/users", { operation: "resetPassword", passwordResetToken: passwordResetToken, password: newPassword }, function(error, data) {
+						if(error) {
+							notifyError(error);
+						} else if(data && data.success) {
+							window.alert("Wachtwoord is succesvol gewijzigd!");
+							removeSearchParametersFromURL();
+							showPage("home");
+						} else {
+							window.alert("Het nieuwe wachtwoord kon niet goed geregistreerd worden.");
 						}
 					});
 				}
@@ -106,14 +186,14 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var emailValue = form.select("#registerEmailInput").property("value");
-					var newPasswordValue = form.select("#registerNewPasswordInput").property("value");
-					var verifyPasswordValue = form.select("#registerVerifyPasswordInput").property("value");
-					if(newPasswordValue !== verifyPasswordValue) {
+					var email = form.select("#registerEmailInput").property("value");
+					var newPassword = form.select("#registerNewPasswordInput").property("value");
+					var verifyPassword = form.select("#registerVerifyPasswordInput").property("value");
+					if(newPassword !== verifyPassword) {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
 					}
-					sendPostRequest("api/users", { email: emailValue, password: newPasswordValue }, function(error, data) {
+					sendPostRequest("api/users", { email: email, password: newPassword }, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data && data.id) {
@@ -145,8 +225,8 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var activationTokenValue = form.select("#activationTokenInput").property("value");
-					sendPutRequest("api/users", { activationToken: activationTokenValue }, function(error, data) {
+					var activationToken = form.select("#activationTokenInput").property("value");
+					sendPatchRequest("api/users", { operation: "activate", activationToken: activationToken }, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data && data.success) {
@@ -161,6 +241,9 @@ var app = {
 			}
 		}
 	},
+
+	// Session
+	session: undefined,
 
 	// Selections
 	selections: {}
@@ -179,14 +262,18 @@ function sendPutRequest(url, requestData, callback) {
 	return sendAPIRequest(url, "PUT", requestData, callback);
 }
 
-function sendDeleteRequest(url, requestData, callback) {
-	return sendAPIRequest(url, "DELETE", requestData, callback);
+function sendPatchRequest(url, requestData, callback) {
+	return sendAPIRequest(url, "PATCH", requestData, callback);
+}
+
+function sendDeleteRequest(url, callback) {
+	return sendAPIRequest(url, "DELETE", null, callback);
 }
 
 function sendAPIRequest(url, method, requestData, callback) {
 	var sessionToken = "";
-	if(app.selections.session) {
-		sessionToken =  app.selections.session.token || null;
+	if(app.session) {
+		sessionToken =  app.session.token || "";
 	}
 	d3.request(url)
 		.mimeType("application/json")
@@ -221,10 +308,14 @@ function showPage(id) {
 	// Check if user is logged in and if not redirect to relevant page
 	if(!app.selections.user && page.isUserRequired) {
 
-		// Decide between login or activation
+		// Decide between login, activation or password reset
 		var activationToken = getActivationTokenFromURL();
+		var passwordResetToken = getPasswordResetTokenFromURL();
 		if(activationToken) {
 			id = "userActivation";
+			page = app.pages[id];
+		} else if(passwordResetToken) {
+			id = "resetPassword";
 			page = app.pages[id];
 		} else {
 			id = "login";
@@ -409,6 +500,15 @@ function getActivationTokenFromURL() {
 	var searchParameters = getSearchParametersFromURL();
 	if(searchParameters && searchParameters[ACTIVATION_CODE_KEY] && searchParameters[ACTIVATION_CODE_KEY].length > 0) {
 		return searchParameters[ACTIVATION_CODE_KEY];
+	}
+	return undefined;
+}
+
+// Answer the password reset token from the URL
+function getPasswordResetTokenFromURL() {
+	var searchParameters = getSearchParametersFromURL();
+	if(searchParameters && searchParameters[PASSWORD_RESET_CODE_KEY] && searchParameters[PASSWORD_RESET_CODE_KEY].length > 0) {
+		return searchParameters[PASSWORD_RESET_CODE_KEY];
 	}
 	return undefined;
 }

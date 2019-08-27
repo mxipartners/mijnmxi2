@@ -12,6 +12,7 @@
 		<div id="home" class="page">
 			<a class="nav" href="#projects">Projecten</a>
 			<a class="nav" href="#members">Deelnemers</a>
+			<a class="nav" href="#logout">Log out</a>
 		</div>
 		<div id="projects" class="page">
 			Projecten pagina
@@ -43,8 +44,34 @@
 				<input id="loginPasswordInput" type="password" autocomplete="current-password" required>
 			</form>
 			<a class="action" href="#login">Login</a>
+			<a class="nav" href="#passwordForgotten">Wachtwoord vergeten</a>
 			<a class="nav" href="#userRegistration">Nieuwe gebruiker</a>
 			<a class="nav" href="#userActivation">Activeer gebruiker</a>
+			<a class="nav" href="#home">Terug</a>
+		</div>
+		<div id="logout" class="page">
+			Bedankt voor het bezoek!
+		</div>
+		<div id="passwordForgotten" class="page">
+			Wachtwoord vergeten
+			<form action="">
+				<label for="loginEmailInput">Email-adres</label>
+				<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+			</form>
+			<a class="action" href="#passwordForgotten">Verstuur herstelmail</a>
+			<a class="nav" href="#home">Terug</a>
+		</div>
+		<div id="resetPassword" class="page">
+			Wachtwoord herstel
+			<form action="">
+				<label for="passwordResetTokenInput">Herstelcode</label>
+				<input id="passwordResetTokenInput" type="text" autocomplete="no" autofocus placeholder="Activatiecode" required>
+				<label for="passwordInput">Wachtwoord</label>
+				<input id="passwordInput" type="password" autocomplete="new-password" required>
+				<label for="verifyPasswordInput">Verificatie wachtwoord</label>
+				<input id="verifyPasswordInput" type="password" autocomplete="new-password" required>
+			</form>
+			<a class="action" href="#resetPassword">Opnieuw instellen</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="userRegistration" class="page">
