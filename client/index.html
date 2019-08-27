@@ -52,16 +52,24 @@
 			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="login" class="page">
-			Login pagina
-			<form action="">
-				<label for="loginEmailInput">Email-adres</label>
-				<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
-				<label for="loginPasswordInput">Wachtwoord</label>
-				<input id="loginPasswordInput" type="password" autocomplete="current-password" required>
-			</form>
-			<a class="action" href="#login">Login</a>
-			<a class="nav" href="#passwordForgotten">Wachtwoord vergeten</a>
-			<a class="nav" href="#userRegistration">Nieuwe gebruiker</a>
+			<div class="logo">
+				<img src="/images/logo.svg">
+			</div>
+			<div class="credentials">
+				<div class="entry border">
+					<form action="">
+						<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+						<input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="Wachtwoord" required>
+					</form>
+				</div>
+				<div class="action">
+					<a class="action" href="#login"><img src="/images/me-button.svg"></a>
+				</div>
+			</div>
+			<div class="button-row">
+				<a class="action" href="#passwordForgotten"><img src="/images/password-forgotten-button.svg"></a>
+				<a class="action" href="#userRegistration"><img src="/images/add-button.svg"></a>
+			</div>
 			<a class="nav" href="#userActivation">Activeer gebruiker</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
@@ -71,8 +79,8 @@
 		<div id="passwordForgotten" class="page">
 			Wachtwoord vergeten
 			<form action="">
-				<label for="loginEmailInput">Email-adres</label>
-				<input id="loginEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
+				<label for="passwordForgottenEmailInput">Email-adres</label>
+				<input id="passwordForgottenEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
 			</form>
 			<a class="action" href="#passwordForgotten">Verstuur herstelmail</a>
 			<a class="nav" href="#home">Terug</a>
@@ -81,7 +89,7 @@
 			Wachtwoord herstel
 			<form action="">
 				<label for="passwordResetTokenInput">Herstelcode</label>
-				<input id="passwordResetTokenInput" type="text" autocomplete="no" autofocus placeholder="Activatiecode" required>
+				<input id="passwordResetTokenInput" type="text" autocomplete="no" autofocus placeholder="Wachtwoordherstelcode" required>
 				<label for="passwordInput">Wachtwoord</label>
 				<input id="passwordInput" type="password" autocomplete="new-password" required>
 				<label for="verifyPasswordInput">Verificatie wachtwoord</label>
