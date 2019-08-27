@@ -9,6 +9,18 @@
 		<title>mijn.mxi.nl</title>
 	</head>
 	<body>
+		<div id="templates">
+			<div id="top-buttons" class="button-row">
+				<img src="/images/callmxi-button.svg" alt="Bel M&I/Partners">
+				<img src="/images/logout-button.svg" alt="Log uit">
+			</div>
+			<div id="bottom-buttons" class="button-row">
+				<img src="/images/me-button.svg" alt="Bel M&I/Partners">
+				<img src="/images/message-button.svg" alt="Log uit">
+				<img src="/images/call-button.svg" alt="Bel M&I/Partners">
+				<img src="/images/add-button.svg" alt="Log uit">
+			</div>
+		</div>
 		<div id="home" class="page">
 			<a class="nav" href="#projects">Projecten</a>
 			<a class="nav" href="#members">Deelnemers</a>
@@ -16,18 +28,22 @@
 			<a class="nav" href="#logout">Log out</a>
 		</div>
 		<div id="projects" class="page">
+			<div data-import="{{'#top-buttons'}}"></div>
 			Projecten pagina
 			<ul data-repeat="{{d}}">
 				<li>{{d.name}}</li>
 			</ul>
 			<a class="nav" href="#home">Terug</a>
+			<div data-import="{{'#bottom-buttons'}}"></div>
 		</div>
 		<div id="members" class="page">
+			<div data-import="{{'#top-buttons'}}"></div>
 			Deelnemers pagina
 			<ul data-repeat="{{d}}">
 				<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
 			</ul>
 			<a class="nav" href="#home">Terug</a>
+			<div data-import="{{'#bottom-buttons'}}"></div>
 		</div>
 		<div id="member" class="page">
 			Deelnemer pagina
@@ -121,5 +137,7 @@
 			<a class="action" href="#activate">Activeer</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
+		<footer>
+		</footer>
 	</body>
 </html>
