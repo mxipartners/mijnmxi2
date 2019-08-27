@@ -26,6 +26,7 @@
     "prepublishOnly": "npm run test && uglifyjs build/servers.js -c -m -o build/servers.min.js"
   },
   "dependencies": {
+
     "bcrypt": "^3",
     "better-sqlite3": "^4",
     "nodemailer": "^6"
