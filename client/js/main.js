@@ -88,7 +88,13 @@ var app = {
 							notifyError(error);
 						} else if(data && data.token) {
 							app.selections.user = email;
-							app.session = data;
+							app.session.token = data.token;
+							try {
+								window.localStorage.setItem("sessionToken", data.token);
+								window.localStorage.setItem("userId", email);
+							} catch(error) {
+								console.error("Can't store sessionToken and/or userId", error);
+							}
 							showPage("home");
 						} else {
 							window.alert("De ingevoerde logingegevens kloppen niet!");
@@ -105,6 +111,12 @@ var app = {
 				// Remove all but session token from session state
 				var sessionToken = app.session.token;
 				app.selections = { session: { token: sessionToken } };
+				try {
+					window.localStorage.removeItem("sessionToken");
+					window.localStorage.removeItem("userId");
+				} catch(error) {
+					console.error("Can't remove sessionToken and/or userId", error);
+				}
 				sendDeleteRequest("api/sessions/" + sessionToken, function(error, data) {
 					if(error) {
 						console.error(error);
@@ -243,7 +255,7 @@ var app = {
 	},
 
 	// Session
-	session: undefined,
+	session: { token: undefined },
 
 	// Selections
 	selections: {}
@@ -338,6 +350,14 @@ function showPage(id) {
 
 // Initialize app after full page is loaded
 function initializeAfterLoad() {
+
+	// Get previously stored session token
+	try {
+		app.session.token = window.localStorage.getItem("sessionToken") || undefined;
+		app.selections.user = window.localStorage.getItem("userId") || undefined;
+	} catch(error) {
+		console.error("Can't retrieve sessionToken and/or userId");
+	}
 
 	// Initialize pages in app
 	Object.keys(app.pages).forEach(function(pageId) {
