@@ -122,6 +122,13 @@ var handlers = [
 		}
 	},
 	{
+		isSessionRequired: true,
+		path: "/api/users/:email",
+		actions: {
+			GET: function(params) { return dataStorage.getUser(params) || resultCodes.noResourceFound; }
+		}
+	},
+	{
 		isSessionRequired: false,
 		path: "/api/sessions",
 		actions: {
@@ -137,7 +144,7 @@ var handlers = [
 				delete data.password;
 
 				// Retrieve user
-				var user = dataStorage.getUser(data);
+				var user = dataStorage.getPassword(data);
 				if(!user || !users.comparePasswordHash(password, user.passwordHash)) {
 					return resultCodes.invalidData;
 				}
