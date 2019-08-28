@@ -483,19 +483,6 @@ function initializeAfterLoad() {
 		showPage("member");
 	});
 
-	// Add a span after input fields which are 'required' to allow CSS to provide certain styling (which is not possible on an input element)
-	d3.selectAll("input[required]").each(function() {
-
-		// Select parent node
-		var node = this;
-		d3.select(node.parentNode)
-
-			// Insert a span before the input's next sibling (ie directly after the input)
-			.insert("span", function() { return node.nextSibling; })
-				.attr("class", "required")
-		;
-	});
-
 	// Create templates from pages
 	d3.selectAll("#templates > *").template();
 	d3.selectAll(".page").template();

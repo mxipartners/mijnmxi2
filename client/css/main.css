@@ -227,11 +227,6 @@ input[type="password"] {
 	text-overflow: clip;
 }
 
-input:required + span.required::after {
-	display: inline-block;
-	content: "*";
-}
-
 input:invalid {
 	box-shadow: none;
 }
