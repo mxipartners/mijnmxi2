@@ -1,3 +1,21 @@
+/* Definitions */
+:root {
+	/* Colors */
+	--background-color: rgb(74, 92, 104);
+	--text-color: rgb(102, 102, 102);
+	--input-background-color: rgb(102, 117, 126);
+	--input-text-color: rgb(255, 255, 255);
+	--input-text-placeholder-color: rgb(176, 176, 176);
+	--highlight-color: rgb(255, 207, 0);
+
+	/* Dimensions */
+	--button-size: 3rem;
+	--button-group-size: 4rem;
+
+	/* Transition timing */
+	--ease: .5s ease .1s;
+}
+
 *, *:before, *:after {
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -11,8 +29,8 @@ html, body {
 	height: 100%;
 
 	/* Set default colors and font */
-	background-color: #4a5c68;
-	color: #666666;
+	background-color: var(--background-color);
+	color: var(--text-color);
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -25,6 +43,7 @@ body {
 	display: none;
 }
 
+/* Page and page elements generic */
 .page {
 	display: none;
 }
@@ -33,10 +52,127 @@ body {
 	display: block;
 }
 
-.page li {
-	cursor: pointer;
+.page .content {
+background-color: rgba(60, 50, 50, .1); /* debug */
+	position: absolute;
+	z-index: 2;
+	transition: left var(--ease), top var(--ease), width var(--ease), height var(--ease);
 }
 
+/* Image buttons in groups on top/bottom (or left/right in landscape mode) */
+.buttons {
+	transition: left var(--ease), top var(--ease), width var(--ease), height var(--ease);
+}
+
+.button {
+	width: var(--button-size);
+	height: var(--button-size);
+	transition: left var(--ease), top var(--ease);
+}
+
+@media (orientation: landscape) {
+	.buttons.x2,
+	.buttons.x4 {
+		position: absolute;
+		height: 100%;
+		width: var(--button-group-size);
+	}
+	.buttons.x2 .button,
+	.buttons.x4 .button {
+		position: absolute;
+		left: calc((var(--button-group-size) - var(--button-size)) / 2);
+	}
+	.buttons.x2 .button:nth-child(1) {
+		top: calc(12.5% - var(--button-size) / 2);
+	}
+	.buttons.x2 .button:nth-child(2) {
+		top: calc(87.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(1) {
+		top: calc(12.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(2) {
+		top: calc(37.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(3) {
+		top: calc(62.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(4) {
+		top: calc(87.5% - var(--button-size) / 2);
+	}
+
+	/* Page specific - projects & members */
+	#projects > div:first-child .buttons,
+	#members > div:first-child .buttons {
+		left: 0;
+		top: 0;
+	}
+	#projects > div:last-child .buttons,
+	#members > div:last-child .buttons {
+		left: calc(100% - var(--button-group-size));
+		top: 0;
+	}
+	#projects .content,
+	#members .content {
+		left: var(--button-group-size);
+		top: 0;
+		width: calc(100% - 2 * var(--button-group-size));
+		height: 100%;
+	}
+}
+
+@media (orientation: portrait) {
+	.buttons.x2,
+	.buttons.x4 {
+		position: absolute;
+		width: 100%;
+		height: var(--button-group-size);
+	}
+	.buttons.x2 .button,
+	.buttons.x4 .button {
+		position: absolute;
+		top: calc((var(--button-group-size) - var(--button-size)) / 2);
+	}
+	.buttons.x2 .button:nth-child(1) {
+		left: calc(12.5% - var(--button-size) / 2);
+	}
+	.buttons.x2 .button:nth-child(2) {
+		left: calc(87.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(1) {
+		left: calc(12.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(2) {
+		left: calc(37.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(3) {
+		left: calc(62.5% - var(--button-size) / 2);
+	}
+	.buttons.x4 .button:nth-child(4) {
+		left: calc(87.5% - var(--button-size) / 2);
+	}
+
+	/* Page specific - projects & members */
+	#projects > div:first-child .buttons,
+	#members > div:first-child .buttons {
+		left: 0;
+		top: 0;
+	}
+	#projects > div:last-child .buttons,
+	#members > div:last-child .buttons {
+		left: 0;
+		top: calc(100% - var(--button-group-size));
+	}
+	#projects .content,
+	#members .content {
+		left: 0;
+		top: var(--button-group-size);
+		width: 100%;
+		height: calc(100% - 2 * var(--button-group-size));
+	}
+}
+
+/* Page specific - login */
 #login .logo {
 	display: flex;
 	flex-direction: row;
@@ -74,30 +210,16 @@ body {
 	margin-right: 5%;
 }
 
-#login .button-row {
-}
-
-.button-row {
-	display: flex;
-	flex-direction: row;
-	margin-top: 8px;
-	margin-bottom: 8px;
-}
-
-.button-row img {
-	flex: auto;
-	height: 2.5em;
-}
-
+/* Input elements */
 input {
 	border: none;
-	border-radius: 0px;
+	border-radius: 0;
 	padding: 10px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	color: #fff;
-	background-color: #66757e;
+	color: var(--input-text-color);
+	background-color: var(--input-background-color);
 	box-shadow: none;
 }
 
@@ -111,20 +233,14 @@ input:required + span.required::after {
 }
 
 input:invalid {
-	border-width: 2px;
-	border-color: #f00;
-}
-
-:invalid,
-:-moz-submit-invalid,
-:-moz-ui-invalid {
 	box-shadow: none;
 }
 
+/* Navigation elements */
 a.nav {
 	display: block;
-	padding-top: 0.3em;
-	padding-bottom: 0.3em;
+	padding-top: 0.3rem;
+	padding-bottom: 0.3rem;
 }
 
 a.action {
@@ -139,15 +255,18 @@ a.action {
 /* Display a block (div) bordered (yellow/orange) */
 .border {
 	border-width: 2px;
-	border-color: #ffcf00;
+	border-color: var(--highlight-color);
 	border-style: solid;
 	border-radius: 10px;
 	padding: 5px;
-	background-color: #66757e;
+	background-color: var(--input-background-color);
 }
 
+/* Underline (all but last) input elements within bordered block */
 .border input:not(:last-child) {
-	border-bottom: 1px #FFFFFF solid;
+	border-bottom-width: 1px;
+	border-bottom-color: var(--input-text-color);
+	border-bottom-style: solid;
 }
 
 /* Prevent 'glow' on input elements on Safari */
@@ -156,15 +275,10 @@ a.action {
 }
 
 /* Placeholder color forced */
-::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: #bbb;
-}
-::-moz-placeholder { /* Firefox 19+ */
-  color: #bbb;
-}
-:-ms-input-placeholder { /* IE 10+ */
-  color: #bbb;
-}
-:-moz-placeholder { /* Firefox 18- */
-  color: #bbb;
+::placeholder,			/* Newer browsers, expirimental */
+::-webkit-input-placeholder,	/* Chrome/Opera/Safari */
+::-moz-placeholder,		/* Firefox 19+ */
+:-ms-input-placeholder,		/* IE 10+ */
+:-moz-placeholder {		/* Firefox 18- */
+	color: var(--input-text-placeholder-color);
 }

@@ -2,7 +2,35 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=0.86, minimum-scale=0.86">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<meta name="apple-mobile-web-app-title" content="Mijn M&I">
+		<meta name="application-name" content="Mijn M&I">
+		<meta name="msapplication-TileColor" content="#da532c">
+		<meta name="msapplication-TileImage" content="/icons/mstile-144x144.png">
+		<meta name="msapplication-config" content="/icons/browserconfig.xml">
+		<meta name="theme-color" content="#ffffff">
+
 		<link rel="stylesheet" href="css/main.css"> 
+		<link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-touch-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-touch-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-touch-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-touch-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-touch-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-touch-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png">
+		<link rel="icon" type="image/png" href="/icons/favicon-32x32.png" sizes="32x32">
+		<link rel="icon" type="image/png" href="/icons/android-chrome-192x192.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96">
+		<link rel="icon" type="image/png" href="/icons/favicon-16x16.png" sizes="16x16">
+		<link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5">
+		<link rel="shortcut icon" href="/icons/favicon.ico">
+		<link rel="manifest" href="/icons/manifest.json">
+
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<script src="https://unpkg.com/d3-template-plugin/build/d3-template.min.js"></script>
 		<script src="js/main.js"></script>
@@ -10,15 +38,15 @@
 	</head>
 	<body>
 		<div id="templates">
-			<div id="top-buttons" class="button-row">
-				<img src="/images/callmxi-button.svg" alt="Bel M&I/Partners">
-				<img src="/images/logout-button.svg" alt="Log uit">
+			<div id="first-dial-buttons" class="buttons x2">
+				<img class="button" src="/images/callmxi-button.svg" alt="M&I/Partners bellen">
+				<img class="button" src="/images/logout-button.svg" alt="Afsluiten">
 			</div>
-			<div id="bottom-buttons" class="button-row">
-				<img src="/images/me-button.svg" alt="Bel M&I/Partners">
-				<img src="/images/message-button.svg" alt="Log uit">
-				<img src="/images/call-button.svg" alt="Bel M&I/Partners">
-				<img src="/images/add-button.svg" alt="Log uit">
+			<div id="second-dial-buttons" class="buttons x4">
+				<img class="button" src="/images/me-button.svg" alt="Mij tonen">
+				<img class="button" src="/images/message-button.svg" alt="Bericht sturen">
+				<img class="button" src="/images/call-button.svg" alt="Opbellen">
+				<img class="button" src="/images/add-button.svg" alt="Item toevoegen">
 			</div>
 		</div>
 		<div id="home" class="page">
@@ -28,22 +56,24 @@
 			<a class="nav" href="#logout">Log out</a>
 		</div>
 		<div id="projects" class="page">
-			<div data-import="{{'#top-buttons'}}"></div>
-			Projecten pagina
-			<ul data-repeat="{{d}}">
-				<li>{{d.name}}</li>
-			</ul>
-			<a class="nav" href="#home">Terug</a>
-			<div data-import="{{'#bottom-buttons'}}"></div>
+			<div data-import="{{'#first-dial-buttons'}}"></div>
+			<div class="content">
+				Projecten pagina
+				<ul data-repeat="{{d}}">
+					<li>{{d.name}}</li>
+				</ul>
+				<a class="nav" href="#home">Terug</a>
+			</div>
+			<div data-import="{{'#second-dial-buttons'}}"></div>
 		</div>
 		<div id="members" class="page">
-			<div data-import="{{'#top-buttons'}}"></div>
+			<div data-import="{{'#first-dial-buttons'}}"></div>
 			Deelnemers pagina
 			<ul data-repeat="{{d}}">
 				<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
 			</ul>
 			<a class="nav" href="#home">Terug</a>
-			<div data-import="{{'#bottom-buttons'}}"></div>
+			<div data-import="{{'#second-dial-buttons'}}"></div>
 		</div>
 		<div id="member" class="page">
 			Deelnemer pagina
@@ -56,23 +86,22 @@
 			Profielpagina	
 			<h1>Profielpagina</h1>
 				<form action="">
-				<label for="fullNameInput">Volledige naam</label>
-				<input id="fullNameInput" type="name" autocomplete="name" autofocus placeholder="Vul hier uw naam in" >
-				<label for="fullNameInput">Voornaam</label>
-				<input id="shortNameInput" type="shortName" autocomplete="shortName" autofocus placeholder="Vul hier uw voornaam in" >
-				<label for="fullNameInput">Telefoonnummer</label>
-				<input id="phoneNumberInput" type="phoneNumber" autocomplete="phoneNumber" autofocus placeholder="Vul hier uw telefoonnummer in" >
-				<label for="fullNameInput">Skype-adres</label>
-				<input id="skypeAddressInput" type="skypeAddress" autocomplete="skypeAddress" autofocus placeholder="Vul hier uw Skype-adres in" >
-				
-				<ul>
-				<li>{{d.id}}</li>
-				<li>{{d.email}}</li>
-				<li>{{d.phoneNumber}}</li>
-				<li>{{d.skypeAddress}}</li>
-			</ul>
-			
-			</form>
+					<label for="fullNameInput">Volledige naam</label>
+					<input id="fullNameInput" type="name" autocomplete="name" autofocus placeholder="Vul hier uw naam in" >
+					<label for="fullNameInput">Voornaam</label>
+					<input id="shortNameInput" type="shortName" autocomplete="shortName" autofocus placeholder="Vul hier uw voornaam in" >
+					<label for="fullNameInput">Telefoonnummer</label>
+					<input id="phoneNumberInput" type="phoneNumber" autocomplete="phoneNumber" autofocus placeholder="Vul hier uw telefoonnummer in" >
+					<label for="fullNameInput">Skype-adres</label>
+					<input id="skypeAddressInput" type="skypeAddress" autocomplete="skypeAddress" autofocus placeholder="Vul hier uw Skype-adres in" >
+					
+					<ul>
+						<li>{{d.id}}</li>
+						<li>{{d.email}}</li>
+						<li>{{d.phoneNumber}}</li>
+						<li>{{d.skypeAddress}}</li>
+					</ul>
+				</form>
 			<a class="action" href="#aanpassen">Aanpassen</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
@@ -88,12 +117,12 @@
 					</form>
 				</div>
 				<div class="action">
-					<a class="action" href="#login"><img src="/images/me-button.svg"></a>
+					<a class="action" href="#login"><img class="button" src="/images/me-button.svg" alt="Aanmelden"></a>
 				</div>
 			</div>
 			<div class="button-row">
-				<a class="action" href="#passwordForgotten"><img src="/images/password-forgotten-button.svg"></a>
-				<a class="action" href="#userRegistration"><img src="/images/add-button.svg"></a>
+				<a class="action" href="#passwordForgotten"><img class="button" src="/images/password-forgotten-button.svg" alt="Wachtwoord vergeten"></a>
+				<a class="action" href="#userRegistration"><img class="button" src="/images/add-button.svg" alt="Account maken"></a>
 			</div>
 			<a class="nav" href="#userActivation">Activeer gebruiker</a>
 			<a class="nav" href="#home">Terug</a>
@@ -145,7 +174,5 @@
 			<a class="action" href="#activate">Activeer</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
-		<footer>
-		</footer>
 	</body>
 </html>
