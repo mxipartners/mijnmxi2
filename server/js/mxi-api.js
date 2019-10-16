@@ -129,7 +129,7 @@ const createMxIAPI = function(resources) {
 						text: ACTIVATION_MAIL_TEXT.replace(/{link}/g, link),
 						html: ACTIVATION_MAIL_HTML.replace(/{link}/g, link)
 					};
-					mailer.sendMessage("erik.stel@mxi.nl", "Activatielink voor mijn.mxi.nl", mailMessage);
+					mailer.sendMessage(request.getParameter("email"), "Activatielink voor mijn.mxi.nl", mailMessage);
 				}
 
 				return result;
@@ -185,7 +185,7 @@ const createMxIAPI = function(resources) {
 							text: PASSWORD_RESET_MAIL_TEXT.replace(/{link}/g, link),
 							html: PASSWORD_RESET_MAIL_HTML.replace(/{link}/g, link)
 						};
-						mailer.sendMessage("erik.stel@mxi.nl", "Wachtwoordherstellink voor mijn.mxi.nl", mailMessage);
+						mailer.sendMessage(request.getParameter("email"), "Wachtwoordherstellink voor mijn.mxi.nl", mailMessage);
 					}
 					return result;
 				}
