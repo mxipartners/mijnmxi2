@@ -70,6 +70,10 @@ background-color: rgba(60, 50, 50, .1); /* debug */
 	transition: left var(--ease), top var(--ease);
 }
 
+.button:hover {
+  filter: invert(0) sepia(1) saturate(13) hue-rotate(349.2deg) brightness(0.94);
+}
+
 @media (orientation: landscape) {
 	.buttons.x2,
 	.buttons.x4 {
