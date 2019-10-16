@@ -46,7 +46,7 @@
 				<img class="button" src="/images/me-button.svg" alt="Mij tonen">
 				<img class="button" src="/images/message-button.svg" alt="Bericht sturen">
 				<img class="button" src="/images/call-button.svg" alt="Opbellen">
-				<img class="button" src="/images/add-button.svg" alt="Item toevoegen">
+				<a href="#addElement" class="button action"><img src="/images/add-button.svg" alt="Item toevoegen"></a>
 			</div>
 		</div>
 		<div id="home" class="page">
@@ -62,9 +62,20 @@
 				<ul data-repeat="{{d}}">
 					<li>{{d.name}}</li>
 				</ul>
+				<a href="#addElement" class="action">Voeg toe</a>
 				<a class="nav" href="#home">Terug</a>
 			</div>
 			<div data-import="{{'#second-dial-buttons'}}"></div>
+		</div>
+		<div id="project" class="page">
+			<h1>Projectpagina</h1>
+			<div class="project">
+				<div class="entry border">
+					<input id="projectNameInput" type="text" autocomplete="off" autofocus placeholder="Projectnaam" data-prop-value="{{d.name}}">
+				</div>
+			</div>
+			<a class="action" href="#save">Opslaan</a>
+			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="members" class="page">
 			<div data-import="{{'#first-dial-buttons'}}"></div>

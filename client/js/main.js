@@ -39,9 +39,56 @@ var app = {
 						pageElement.render(data);
 					}
 				});
+			},
+			actions: {
+				addElement: function() {
+					app.selections.project = {
+						id: null, 
+						name: ""
+					};
+					showPage("project");
+				}
 			}
 		},
 
+		// Project page showing one single project
+		project: {
+			isUserRequired: true,
+			beforeShow: function(pageElement) {
+				pageElement.render(app.selections.project);
+			},
+			actions: {
+				save: function(){
+					var form = this.element.select("form");
+				//	if(!validateForm(form, true)) {
+					//	return;
+			//		}
+					var name = d3.select("#projectNameInput").property("value");
+					var parameters = { 
+						//id: app.selections.project.id, 
+						name: name
+					};
+					if(app.selections.project.id === null){
+						sendPostRequest("api/projects", parameters, function(error, data) {
+							if(error) {
+								console.error(error);
+							} else if(data) {
+								window.alert("Gelukt!");
+							}
+						});
+					} else {
+						sendPutRequest("api/projects/" + app.selections.project.id, parameters, function(error, data) {
+							if(error) {
+								console.error(error);
+							} else if(data) {
+								window.alert("Gelukt!");
+							}
+						});
+					}
+				}
+			}
+		},
+		
 		// Members page showing all members of the currently selected project
 		members: {
 			isUserRequired: true,
@@ -90,28 +137,28 @@ var app = {
 				});
 			},
 			actions: {
-			edit: function() {
-					var form = this.element.select("form");
-					if(!validateForm(form, true)) {
-						return;
-					}
-					var name = form.select("#fullNameInput").property("value");
-					var shortName = form.select("#shortNameInput").property("value");
-					var phoneNumber = form.select("#phoneNumberInput").property("value");
-					var skypeAddress = form.select("#skypeAddressInput").property("value");
-					var parameters = { 
-						name: name, 
-						shortName: shortName, 
-						phoneNumber: phoneNumber, 
-						skypeAddress: skypeAddress
-					};
-					sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
-					if(error) {
-						console.error(error);
-					} else if(data) {
-						window.alert("Gelukt!");
-					}
-				});
+				edit: function() {
+						var form = this.element.select("form");
+						if(!validateForm(form, true)) {
+							return;
+						}
+						var name = form.select("#fullNameInput").property("value");
+						var shortName = form.select("#shortNameInput").property("value");
+						var phoneNumber = form.select("#phoneNumberInput").property("value");
+						var skypeAddress = form.select("#skypeAddressInput").property("value");
+						var parameters = { 
+							name: name, 
+							shortName: shortName, 
+							phoneNumber: phoneNumber, 
+							skypeAddress: skypeAddress
+						};
+						sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
+						if(error) {
+							console.error(error);
+						} else if(data) {
+							window.alert("Gelukt!");
+						}
+					});
 				}
 			}
 			},
