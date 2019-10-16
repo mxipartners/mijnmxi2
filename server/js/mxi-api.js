@@ -241,6 +241,31 @@ const createMxIAPI = function(resources) {
 				// Retrieve all projects
 				return request.getResource("dataStore").getUser(request.getParameters());
 			}
+		},
+		{
+			method: HTTP_PUT,
+			authorization: hasSession,
+			action: function(request) {
+
+				// Validate input
+				var validators = request.getResource("validators");
+				var validation = validators.validateParameters(request.getParameters(), {
+					id: "id",
+					name: "string",
+					shortName: "string", 
+					phoneNumber: "string",
+					skypeAddress: "string"
+				});
+				if(!validation) {
+					return Result.invalidData;
+				}
+
+				// Add user to request
+				request.addParameter("loginId", request.getResource("user").id);
+
+				// Update user 
+				return request.getResource("dataStore").updateUser(request.getParameters());
+			}
 		}
 	]
 },

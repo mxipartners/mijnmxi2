@@ -84,34 +84,17 @@
 			<h3>{{d.email}}</h3>
 			<a class="nav" href="#home">Terug</a>
 		</div>
-		<div id="profile" class="page" style="padding-left: 50px;">
-			Profielpagina	
+		<div id="profile" class="page">	
 			<h1>Profielpagina</h1>
-				<div style="padding-left: 50px;">
-				<h3>Uw huidige gegevens</h3>
-				<table>
-					<tr><td WIDTH="150" HEIGHT="30">Medewerker ID: </td><td WIDTH="110">{{d.id}}</td></tr>
-					<tr><td WIDTH="150" HEIGHT="30">Voornaam: </td><td WIDTH="110">{{d.shortName}}</td></tr>
-					<tr><td WIDTH="150" HEIGHT="30">Volledige naam: </td><td WIDTH="110">{{d.name}}</td></tr>
-					<tr><td WIDTH="150" HEIGHT="30">E-mailadres: </td><td WIDTH="110">{{d.email}}</td></tr>
-					<tr><td WIDTH="150" HEIGHT="30">Telefoonnummer: </td><td WIDTH="110">{{d.phoneNumber}}</td></tr>
-					<tr><td WIDTH="150" HEIGHT="30">Skype adres: </td><td WIDTH="110">{{d.skypeAddress}}</td></tr>
-				</table>
-				<p>
-				<h3>Wijzig uw gegevens</h3>
-				<form action="">
-				<table>
-					<tr><td WIDTH="150" HEIGHT="30"><label for="shortNameInput">Voornaam</label></td>
-					<td WIDTH="110"><input id="shortNameInput" type="shortName" autocomplete="shortName" autofocus placeholder="Vul hier uw voornaam in" ></td></tr>
-					<tr><td WIDTH="150" HEIGHT="30"><label for="fullNameInput">Volledige naam</label></td>
-					<td WIDTH="110"><input id="fullNameInput" type="name" autocomplete="name" autofocus placeholder="Vul hier uw naam in" ></td></tr>
-					<tr><td WIDTH="150" HEIGHT="30"><label for="phoneNumberInput">Telefoonnummer</label></td>
-					<td WIDTH="110"><input id="phoneNumberInput" type="phoneNumber" autocomplete="phoneNumber" autofocus placeholder="Vul hier uw telefoonnummer in" ></td></tr>
-					<tr><td WIDTH="150" HEIGHT="30"><label for="skypeAddressInput">Skype-adres</label></td>
-					<td WIDTH="110"><input id="skypeAddressInput" type="skypeAddress" autocomplete="skypeAddress" autofocus placeholder="Vul hier uw Skype-adres in" ></td></tr>
-				</table>			
-				</form>
+			<div class="profile">
+				<div class="entry border">
+					E-mailadres: <span>{{d.email}}</span>
+					<input id="shortNameInput" type="text" autocomplete="given-name" autofocus placeholder="Voornaam" data-prop-value="{{d.shortName}}">
+					<input id="fullNameInput" type="text" autocomplete="name" placeholder="Volledige naam" data-prop-value="{{d.name}}">
+					<input id="phoneNumberInput" type="text" autocomplete="tel" placeholder="Telefoonnummer" data-prop-value="{{d.phoneNumber}}">
+					<input id="skypeAddressInput" type="text" placeholder="Skype-adres" data-prop-value="{{d.skypeAddress}}">
 				</div>
+			</div>
 			<a class="action" href="#edit">Aanpassen</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>

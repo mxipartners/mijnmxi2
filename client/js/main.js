@@ -99,11 +99,17 @@ var app = {
 					var shortName = form.select("#shortNameInput").property("value");
 					var phoneNumber = form.select("#phoneNumberInput").property("value");
 					var skypeAddress = form.select("#skypeAddressInput").property("value");
-					sendPutRequest("api/users/" + app.selections.user.id, { name: name, shortName: shortName, phoneNumber: phoneNumber, skypeAddress }, function(error, data) {
+					var parameters = { 
+						name: name, 
+						shortName: shortName, 
+						phoneNumber: phoneNumber, 
+						skypeAddress: skypeAddress
+					};
+					sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
-						pageElement.render(data);
+						window.alert("Gelukt!");
 					}
 				});
 				}
