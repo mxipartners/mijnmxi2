@@ -57,6 +57,10 @@ addStorageOperation("resetPassword", statements.SingleUpdateStatement,
 	"UPDATE users SET passwordHash = :newPasswordHash " +
 		"WHERE id = :loginId"
 );
+addStorageOperation("updateUser", statements.SingleUpdateStatement,
+	"UPDATE users SET name = :name, shortName = :shortName, phoneNumber = :phoneNumber, skypeAddress = :skypeAddress " +
+		"WHERE id = :loginId"
+);
 addStorageOperation("getUser", statements.SingleReadStatement,
 	"SELECT id, name, shortName, email, phoneNumber, skypeAddress FROM users WHERE id = :id"
 );
