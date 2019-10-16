@@ -2,6 +2,7 @@
 var ACTIVATION_CODE_KEY = "activationToken";
 var PASSWORD_RESET_CODE_KEY = "passwordResetToken";
 var EMPTY_FUNCTION = function() {};
+var HTTP_OK_NO_CONTENT = 204;
 
 // Globals
 var app = {
@@ -80,7 +81,7 @@ var app = {
 					console.error("No user selected!");
 					return;
 				}
-				sendGetRequest("api/users/" + app.selections.user, function(error, data) {
+				sendGetRequest("api/users/" + app.selections.user.id, function(error, data) {
 					if(error) {
 						console.error(error);
 					} else if(data) {
@@ -105,11 +106,12 @@ var app = {
 						if(error) {
 							notifyError(error);
 						} else if(data && data.token) {
-							app.selections.user = email;
 							app.session.token = data.token;
+							app.selections.user = { id: data.userId };
+							loadUser();
 							try {
 								window.localStorage.setItem("sessionToken", data.token);
-								window.localStorage.setItem("userId", email);
+								window.localStorage.setItem("userId", data.userId);
 							} catch(error) {
 								console.error("Can't store sessionToken and/or userId", error);
 							}
@@ -132,12 +134,13 @@ var app = {
 		logout: {
 			isUserRequired: true,
 			beforeShow: function(pageElement) {
-				// Remove all but session token from session state
+				// Remove all session state, but remember session token for deleting it
 				var sessionToken = app.session.token;
-				app.selections = { session: { token: sessionToken } };
+				app.selections = {};
 				try {
 					window.localStorage.removeItem("sessionToken");
 					window.localStorage.removeItem("userId");
+					loadUser();
 				} catch(error) {
 					console.error("Can't remove sessionToken and/or userId", error);
 				}
@@ -145,7 +148,7 @@ var app = {
 					if(error) {
 						console.error(error);
 					} else if(data) {
-						console.log("Delete session success: " + data.success);
+						console.log("Delete session success: " + data);
 					}
 				});
 			}
@@ -164,7 +167,7 @@ var app = {
 					sendPatchRequest("api/users", { operation: "passwordForgotten", email: email }, function(error, data) {
 						if(error) {
 							notifyError(error);
-						} else if(data && data.success) {
+						} else if(data) {
 							window.alert("Een mail is verzonden met uw wachtwoordherstelcode!");
 							removeSearchParametersFromURL();
 							showPage("resetPassword");
@@ -201,7 +204,7 @@ var app = {
 					sendPatchRequest("api/users", { operation: "resetPassword", passwordResetToken: passwordResetToken, password: newPassword }, function(error, data) {
 						if(error) {
 							notifyError(error);
-						} else if(data && data.success) {
+						} else if(data) {
 							window.alert("Wachtwoord is succesvol gewijzigd!");
 							removeSearchParametersFromURL();
 							showPage("home");
@@ -231,15 +234,15 @@ var app = {
 					}
 					sendPostRequest("api/users", { email: email, password: newPassword }, function(error, data) {
 						if(error) {
-							notifyError(error);
-						} else if(data && data.id) {
-							window.alert("Account is geregistreerd. Een mail met activatiecode is verzonden naar het opgegeven mail-adres.");
-						} else {
-							if(data && data.code === 409) {
+							if(error.status === 409) {
 								window.alert("Een account met opgegeven mail-adres bestaat al.");
 							} else {
-								window.alert("Het account kon niet geregistreerd worden. Controleer de gegevens en probeer opnieuw.");
+								notifyError(error);
 							}
+						} else if(data) {
+							window.alert("Account is geregistreerd. Een mail met activatiecode is verzonden naar het opgegeven mail-adres.");
+						} else {
+							window.alert("Het account kon niet geregistreerd worden. Controleer de gegevens en probeer opnieuw.");
 						}
 					});
 				}
@@ -265,7 +268,7 @@ var app = {
 					sendPatchRequest("api/users", { operation: "activate", activationToken: activationToken }, function(error, data) {
 						if(error) {
 							notifyError(error);
-						} else if(data && data.success) {
+						} else if(data) {
 							window.alert("Account is succesvol geactiveerd!");
 							removeSearchParametersFromURL();
 							showPage("home");
@@ -284,6 +287,29 @@ var app = {
 	// Selections
 	selections: {}
 };
+
+// Specific API calls
+function loadUser() {
+
+	// Get current user id (if present)
+	var userId = app.selections.user && app.selections.user.id;
+	if(!userId) {
+		return;
+	}
+
+	// Load current user
+	sendGetRequest("api/users/" + userId, function(error, data) {
+		if(error) {
+			console.error(error);
+		} else if(data) {
+			if(data.id === userId) {
+				app.selections.user = data;
+			} else {
+				console.error("Retrieved incorrect user info!");
+			}
+		}
+	});
+}
 
 // Send API request
 function sendGetRequest(url, callback) {
@@ -311,24 +337,33 @@ function sendAPIRequest(url, method, requestData, callback) {
 	if(app.session) {
 		sessionToken =  app.session.token || "";
 	}
-	d3.request(url)
-		.mimeType("application/json")
-		.header("Content-Type", "application/json")
-		.header("X-Session-Token", sessionToken)
-		.response(function(xhr) {
-			try {
-				return JSON.parse(xhr.responseText);
-			} catch(error) {
-				console.error("Failed to parse JSON result", xhr.responseText);
-			}
-			return undefined;
-		})
-		.send(method, requestData === null ? null : JSON.stringify(requestData), function(error, responseData) {
-			if(callback) {
-				callback(error, responseData);
-			}
-		})
-	;
+	fetch(url, {
+		method: method,
+		headers: {
+			"Content-Type": "application/json",
+			"X-Session-Token": sessionToken
+		},
+		body: requestData === null ? null : JSON.stringify(requestData),
+		mode: "cors",
+		redirect: "follow",
+		referrer: "no-referrer",
+		referrerPolicy: "no-referrer",
+		credentials: "omit",
+		cache: "no-store"
+	}).then(function(response) {
+		// If response unsuccessful throw exception, but keep status code
+		if(!response.ok) {
+			console.log(requestData);
+			var error = new Error(response.status + " " + response.statusText);
+			error.status = response.status;
+			throw error;
+		}
+		return response.status === HTTP_OK_NO_CONTENT ? true : response.json();
+	}).then(function(json) {
+		callback(null, json);
+	}).catch(function(error) {
+		callback(error, null);
+	});
 }
 
 // Show page
@@ -342,7 +377,7 @@ function showPage(id) {
 	}
 
 	// Check if user is logged in and if not redirect to relevant page
-	if(!app.selections.user && page.isUserRequired) {
+	if(!(app.selections.user && app.selections.user.id) && page.isUserRequired) {
 
 		// Decide between login, activation or password reset
 		var activationToken = getActivationTokenFromURL();
@@ -378,7 +413,8 @@ function initializeAfterLoad() {
 	// Get previously stored session token
 	try {
 		app.session.token = window.localStorage.getItem("sessionToken") || undefined;
-		app.selections.user = window.localStorage.getItem("userId") || undefined;
+		app.selections.user = { id: +window.localStorage.getItem("userId") || undefined };
+		loadUser();
 	} catch(error) {
 		console.error("Can't retrieve sessionToken and/or userId");
 	}

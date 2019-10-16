@@ -1,14 +1,15 @@
 // Constants
-var PORT = 8080;
+const PORT = 8080;
 
 // Globals
-var https = require("https");
-var http = require("http");
-var fs = require("fs");
-var dataServer = require("./data-server");
+const https = require("https");
+const http = require("http");
+const fs = require("fs");
+const apiServer = require("./api-server");
+//const Uploader = require("./utils/uploader");
 
 // Content types for responses
-var contentTypes = {
+const contentTypes = {
 	html: "text/html",
 	css: "text/css",
 	js: "text/javascript",
@@ -18,15 +19,16 @@ var contentTypes = {
 	png: "image/png",
 	svg: "image/svg+xml"
 };
-var defaultContentType = "application/octet-stream";
+const defaultContentType = "application/octet-stream";
 
 // Create web server (using SSL)
 var webServer = null;
 if(process.env.NODE_ENV !== "production") {
 
 	var webServerOptions = {
-		key: fs.readFileSync("private/cert/server/privkey.pem"),
-		cert: fs.readFileSync("private/cert/server/fullchain.pem")
+		key: fs.readFileSync("private/server/key.pem"),
+		cert: fs.readFileSync("private/server/cert.pem"),
+		passphrase: "GeenGeheimHier"
 	};
 	webServer = https.createServer(webServerOptions, function(request, response) {
 
@@ -37,23 +39,38 @@ if(process.env.NODE_ENV !== "production") {
 			return;
 		}
 
-		// Handle regular request
+		// Handle request
 		var urlWithoutParameters = url.replace(/[?#].*/, "");
-		fs.readFile("client" + urlWithoutParameters, function(error, data) {
-			if(error) {
-				console.error("Error on web-request", error, urlWithoutParameters);
-				response.writeHead(404);
-				response.end("Resource not found");
+		if(urlWithoutParameters === "/admin/uploads/process") {
+			// Handle upload file
+			Uploader.process(request, response);
+		} else if(urlWithoutParameters === "/admin/uploads/revert") {
+			// Handle upload file
+			Uploader.revert(request, response);
+		} else {
+			// Handle regular request
+			var path;
+			if(urlWithoutParameters.startsWith("/admin/uploads/")) {
+				path = urlWithoutParameters.replace(/^\/admin\//, "./").replace(/\.\./g, "");
 			} else {
-				var extension = urlWithoutParameters.replace(/^.*\.([^.]+)$/, "$1");
-				var contentType = contentTypes[extension];
-				if(!contentType) {
-					contentType = defaultContentType;
-				}
-				response.setHeader("Content-Type", contentType);
-				response.end(data);
+				path = "client" + urlWithoutParameters;
 			}
-		});
+			fs.readFile(path, function(error, data) {
+				if(error) {
+					console.error("Error on web-request", error, urlWithoutParameters);
+					response.writeHead(404);
+					response.end("Resource not found");
+				} else {
+					var extension = urlWithoutParameters.replace(/^.*\.([^.]+)$/, "$1");
+					var contentType = contentTypes[extension];
+					if(!contentType) {
+						contentType = defaultContentType;
+					}
+					response.setHeader("Content-Type", contentType);
+					response.end(data);
+				}
+			});
+		}
 	});
 
 	// Forward provided request to API end point (ie through data server)
@@ -63,7 +80,7 @@ if(process.env.NODE_ENV !== "production") {
 		var requestOptions = {
 			protocol: "http:",	// no SSL needed
 			hostname: "localhost",
-			port: dataServer.address().port,
+			port: apiServer.address().port,
 			method: request.method,
 			path: request.url,
 			headers: request.headers
@@ -109,9 +126,9 @@ if(process.env.NODE_ENV !== "production") {
 	// Start listening on provided port
 	webServer.listen(PORT, function(error) {
 		if(error) {
-			console.error("Error in web-server", error);
+			console.error("Error in web-server: ", error);
 		} else {
-			console.log("web-server is listening on port " + PORT);
+			console.log("A web-server is listening on port " + PORT);
 		}
 	});
 }

@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "bcrypt": "^3",
-    "better-sqlite3": "^4",
+    "better-sqlite3": "^5",
     "nodemailer": "^6"
   },
   "devDependencies": {
