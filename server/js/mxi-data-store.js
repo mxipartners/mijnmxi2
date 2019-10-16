@@ -58,7 +58,7 @@ addStorageOperation("resetPassword", statements.SingleUpdateStatement,
 		"WHERE id = :loginId"
 );
 addStorageOperation("getUser", statements.SingleReadStatement,
-	"SELECT id, email, phoneNumber, skypeAddress FROM users WHERE id = :id"
+	"SELECT id, name, shortName, email, phoneNumber, skypeAddress FROM users WHERE id = :id"
 );
 addStorageOperation("privateGetUser", statements.SingleReadStatement,
 	"SELECT id, email, phoneNumber, skypeAddress FROM users " +

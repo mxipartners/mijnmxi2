@@ -58,7 +58,7 @@
 		<div id="projects" class="page">
 			<div data-import="{{'#first-dial-buttons'}}"></div>
 			<div class="content">
-				Projecten pagina
+				<h3>Projecten pagina</h3>
 				<ul data-repeat="{{d}}">
 					<li>{{d.name}}</li>
 				</ul>
@@ -68,11 +68,13 @@
 		</div>
 		<div id="members" class="page">
 			<div data-import="{{'#first-dial-buttons'}}"></div>
-			Deelnemers pagina
+			<div style="padding-left: 50px;">
+			<h3>Deelnemers pagina</h3>
 			<ul data-repeat="{{d}}">
 				<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
 			</ul>
 			<a class="nav" href="#home">Terug</a>
+			</div>
 			<div data-import="{{'#second-dial-buttons'}}"></div>
 		</div>
 		<div id="member" class="page">
@@ -82,29 +84,35 @@
 			<h3>{{d.email}}</h3>
 			<a class="nav" href="#home">Terug</a>
 		</div>
-		<div id="profile" class="page">
+		<div id="profile" class="page" style="padding-left: 50px;">
 			Profielpagina	
 			<h1>Profielpagina</h1>
+				<div style="padding-left: 50px;">
+				<h3>Uw huidige gegevens</h3>
+				<table>
+					<tr><td WIDTH="150" HEIGHT="30">Medewerker ID: </td><td WIDTH="110">{{d.id}}</td></tr>
+					<tr><td WIDTH="150" HEIGHT="30">Voornaam: </td><td WIDTH="110">{{d.shortName}}</td></tr>
+					<tr><td WIDTH="150" HEIGHT="30">Volledige naam: </td><td WIDTH="110">{{d.name}}</td></tr>
+					<tr><td WIDTH="150" HEIGHT="30">E-mailadres: </td><td WIDTH="110">{{d.email}}</td></tr>
+					<tr><td WIDTH="150" HEIGHT="30">Telefoonnummer: </td><td WIDTH="110">{{d.phoneNumber}}</td></tr>
+					<tr><td WIDTH="150" HEIGHT="30">Skype adres: </td><td WIDTH="110">{{d.skypeAddress}}</td></tr>
+				</table>
+				<p>
+				<h3>Wijzig uw gegevens</h3>
 				<form action="">
-					<label for="fullNameInput">Volledige naam</label>
-					<input id="fullNameInput" type="name" autocomplete="name" autofocus placeholder="Vul hier uw naam in" >
-					<label for="fullNameInput">Voornaam</label>
-					<input id="shortNameInput" type="shortName" autocomplete="shortName" autofocus placeholder="Vul hier uw voornaam in" >
-					<label for="fullNameInput">Telefoonnummer</label>
-					<input id="phoneNumberInput" type="phoneNumber" autocomplete="phoneNumber" autofocus placeholder="Vul hier uw telefoonnummer in" >
-					<label for="fullNameInput">Skype-adres</label>
-					<input id="skypeAddressInput" type="skypeAddress" autocomplete="skypeAddress" autofocus placeholder="Vul hier uw Skype-adres in" >
-					
-					<ul>
-						<li>{{d.id}}</li>
-						<li>{{d.email}}</li>
-						<li>{{d.phoneNumber}}</li>
-						<li>{{d.skypeAddress}}</li>
-					</ul>
+				<table>
+					<tr><td WIDTH="150" HEIGHT="30"><label for="shortNameInput">Voornaam</label></td>
+					<td WIDTH="110"><input id="shortNameInput" type="shortName" autocomplete="shortName" autofocus placeholder="Vul hier uw voornaam in" ></td></tr>
+					<tr><td WIDTH="150" HEIGHT="30"><label for="fullNameInput">Volledige naam</label></td>
+					<td WIDTH="110"><input id="fullNameInput" type="name" autocomplete="name" autofocus placeholder="Vul hier uw naam in" ></td></tr>
+					<tr><td WIDTH="150" HEIGHT="30"><label for="phoneNumberInput">Telefoonnummer</label></td>
+					<td WIDTH="110"><input id="phoneNumberInput" type="phoneNumber" autocomplete="phoneNumber" autofocus placeholder="Vul hier uw telefoonnummer in" ></td></tr>
+					<tr><td WIDTH="150" HEIGHT="30"><label for="skypeAddressInput">Skype-adres</label></td>
+					<td WIDTH="110"><input id="skypeAddressInput" type="skypeAddress" autocomplete="skypeAddress" autofocus placeholder="Vul hier uw Skype-adres in" ></td></tr>
+				</table>			
 				</form>
-<!-- Action is missing in main.js
-			<a class="action" href="#aanpassen">Aanpassen</a>
--->
+				</div>
+			<a class="action" href="#edit">Aanpassen</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="login" class="page">
