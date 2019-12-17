@@ -95,30 +95,30 @@ var app = {
 				});
 			},
 			actions: {
-			edit: function() {
-					var form = this.element.select("form");
-					if(!validateForm(form, true)) {
-						return;
+				edit: function() {
+						var form = this.element.select("form");
+						if(!validateForm(form, true)) {
+							return;
+						}
+						var name = form.select("#fullNameInput").property("value");
+						var shortName = form.select("#shortNameInput").property("value");
+						var phoneNumber = form.select("#phoneNumberInput").property("value");
+						var skypeAddress = form.select("#skypeAddressInput").property("value");
+						var parameters = { 
+							name: name, 
+							shortName: shortName, 
+							phoneNumber: phoneNumber, 
+							skypeAddress: skypeAddress
+						};
+						sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
+						if(error) {
+							console.error(error);
+						} else if(data) {
+							window.alert("Gelukt!");
+						}
+					});
 					}
-					var name = form.select("#fullNameInput").property("value");
-					var shortName = form.select("#shortNameInput").property("value");
-					var phoneNumber = form.select("#phoneNumberInput").property("value");
-					var skypeAddress = form.select("#skypeAddressInput").property("value");
-					var parameters = { 
-						name: name, 
-						shortName: shortName, 
-						phoneNumber: phoneNumber, 
-						skypeAddress: skypeAddress
-					};
-					sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
-					if(error) {
-						console.error(error);
-					} else if(data) {
-						window.alert("Gelukt!");
-					}
-				});
 				}
-			}
 			},
 
 		// Login page
