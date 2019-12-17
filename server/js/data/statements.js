@@ -19,9 +19,9 @@ class SingleCreateStatement extends Statement {
 		const self = this;
 
 		try {
-			var id;
+			let id;
 			self._db.transaction(function(statement) {
-				var info = statement.run(params);
+				let info = statement.run(params);
 				if(info.changes !== 1) {
 					throw new Error("Create statement did not result in single row");
 				}
@@ -38,6 +38,41 @@ class SingleCreateStatement extends Statement {
 	}
 }
 
+class SingleCreateOrUpdateStatement extends Statement {
+	constructor(db, sqlStatement) {
+		super(db, sqlStatement);
+	}
+	execute(params, resultClass) {
+		const self = this;
+
+		try {
+			let id;
+			let modificationTimestamp;
+			self._db.transaction(function(statement) {
+				let info = statement.run(params);
+				if(info.changes !== 1) {
+					throw new Error("CreateOrUpdate statement did not result in single row");
+				}
+				if(params["id"] && Number.isInteger(+params["id"])) {
+					id = +params["id"];
+				} else {
+					if(!Number.isInteger(info.lastInsertRowid)) {
+						throw new Error("CreateOrUpdate statement did not result in integer id");
+					}
+					id = info.lastInsertRowid;
+				}
+				if(params["_now"]) {
+					modificationTimestamp = params["_now"];
+				}
+			})(self._statement);
+			return resultClass.fromData({ id: id, modificationTimestamp: modificationTimestamp });
+		} catch(e) {
+			console.error("Failed to add/update element to db:", e);
+			return resultClass.fromSQLException(e, resultClass.invalidData);
+		}
+	}
+}
+
 class SingleReadStatement extends Statement {
 	constructor(db, sqlStatement) {
 		super(db, sqlStatement);
@@ -46,7 +81,7 @@ class SingleReadStatement extends Statement {
 		const self = this;
 
 		try {
-			var element = self._statement.get(params);
+			let element = self._statement.get(params);
 			if(element === undefined) {
 				return resultClass.noResourceFound;
 			}
@@ -83,12 +118,16 @@ class SingleUpdateStatement extends Statement {
 
 		try {
 			self._db.transaction(function(statement) {
-				var info = statement.run(params);
+				let info = statement.run(params);
 				if(info.changes !== 1) {
 					throw new Error("Update statement did not update a single row");
 				}
 			})(self._statement);
-			return resultClass.okNoData;
+			if(params["_now"]) {
+				return resultClass.fromData({ modificationTimestamp: params["_now"] });
+			} else {
+				return resultClass.okNoData;
+			}
 		} catch(e) {
 			console.error("Failed to update element in db:", e);
 			return resultClass.fromSQLException(e, resultClass.invalidData);
@@ -126,7 +165,7 @@ class SingleDeleteStatement extends Statement {
 
 		try {
 			self._db.transaction(function(statement) {
-				var info = statement.run(params);
+				let info = statement.run(params);
 				if(info.changes !== 1) {
 					throw new Error("Delete statement did not delete a single row");
 				}
@@ -162,6 +201,7 @@ class MultiDeleteStatement extends Statement {
 
 module.exports = {
 	SingleCreateStatement: SingleCreateStatement,
+	SingleCreateOrUpdateStatement: SingleCreateOrUpdateStatement,
 
 	SingleReadStatement: SingleReadStatement,
 	MultiReadStatement: MultiReadStatement,

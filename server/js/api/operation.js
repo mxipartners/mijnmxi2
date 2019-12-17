@@ -53,7 +53,7 @@ class Operation {
 
 		// Perform action
 		try {
-			var data = self._action(request);
+			let data = self._action(request);
 			if(data === undefined) {
 				throw new Error("No response from operation " + request.getMethod() + " on " + request.getPath());
 			} else if(Result.isInstance(data)) {

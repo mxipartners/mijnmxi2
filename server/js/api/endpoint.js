@@ -34,16 +34,16 @@ class Endpoint {
 	handle(request) {
 		const self = this;
 
-		var requestParameters = self._requestParametersFromPath(request.getPath());
+		let requestParameters = self._requestParametersFromPath(request.getPath());
 		if(!requestParameters) {
 			return Result.noResourceFound;
 		}
 		request.setParameters(requestParameters);
 
 		// Perform first matching operation
-		var result = null;
+		let result = null;
 		self._operations.some(function(operation) {
-			var operationResult = operation.perform(request);
+			let operationResult = operation.perform(request);
 			result = Result.mostSpecific(result, operationResult);
 
 			return result.isOk();
@@ -88,8 +88,8 @@ class Endpoint {
 		}
 
 		// Iterate over path segments
-		var apiPathSegments = self._pathSegments;
-		var requestPathSegments = requestPath
+		let apiPathSegments = self._pathSegments;
+		let requestPathSegments = requestPath
 			.replace(LEADING_PATH_SEPARATOR_REGEX, "")
 			.split(PATH_SEPARATOR)
 		;
@@ -100,16 +100,16 @@ class Endpoint {
 		}
 
 		// Process the path segments one by one
-		var parameters = {};
-		var success = apiPathSegments.every(function(apiPathSegment, index) {
-			var requestPathSegment = requestPathSegments[index];
+		let parameters = {};
+		let success = apiPathSegments.every(function(apiPathSegment, index) {
+			let requestPathSegment = requestPathSegments[index];
 
 			// Check for parameter or path segment
 			if(apiPathSegment.startsWith(":")) {
 
 				// Store parameter
-				var name = apiPathSegment.slice(1);	// Remove leading ":"
-				var value = decodeURIComponent(requestPathSegment);
+				let name = apiPathSegment.slice(1);	// Remove leading ":"
+				let value = decodeURIComponent(requestPathSegment);
 				parameters[name] = value;
 
 			// Check for matching segment

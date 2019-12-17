@@ -1,11 +1,11 @@
 // Import classes and objects
-var fs = require("fs");
-var nodemailer = require("nodemailer");
-var Validators = require("./validators");
+let fs = require("fs");
+let nodemailer = require("nodemailer");
+let Validators = require("./validators");
 
 // Globals
-var authOptions = JSON.parse(fs.readFileSync("private/server/mail-auth.json"));
-var transport = nodemailer.createTransport({
+let authOptions = JSON.parse(fs.readFileSync("private/server/mail-auth.json"));
+let transport = nodemailer.createTransport({
 	host: "smtp.office365.com",
 	port: 587,
 	secure: false,
@@ -34,7 +34,7 @@ class Mailer {
 		}
 
 		// Create mail message
-		var mailMessage = {
+		let mailMessage = {
 			from: authOptions.user,
 			to: to,
 			subject: subject
@@ -47,7 +47,7 @@ class Mailer {
 		}
 
 		// Send mail
-		transport.sendMail(mailMessage, function(error, data) {
+		transport.sendMail(mailMessage, function(error) {
 			if(error) {
 				console.error("Failed to send mail: ", error);
 			}

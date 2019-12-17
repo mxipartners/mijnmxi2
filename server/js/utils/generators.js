@@ -1,9 +1,9 @@
 // Constants
-var BCRYPT_HASH_SALT_ROUNDS = 10;
+let BCRYPT_HASH_SALT_ROUNDS = 10;
 
 // Import classes and objects
-var crypto = require("crypto");
-var bcrypt = require("bcrypt");
+let crypto = require("crypto");
+let bcrypt = require("bcrypt");
 
 // Class: Generators create tokens and hashes
 class Generators {
@@ -17,11 +17,22 @@ class Generators {
 		return crypto.randomBytes(length).toString("hex");
 	}
 
+	// Random number functions
+	static generateRandomNumber(lower, upper) {
+		let spread = upper - lower;
+		if(spread < 0) {
+			throw new Error("generateRandomNumber received inconsistent arguments");
+		}
+		let random = crypto.randomBytes(4).readUInt32BE(0);
+		let index = random % (spread + 1);
+		return lower + index;
+	}
+
 	// Password functions
 	static generatePasswordHash(password) {
 		return bcrypt.hashSync(password, BCRYPT_HASH_SALT_ROUNDS);
 	}
-	static comparePasswordAndHash(password, hash) {
+	static comparePasswordHash(password, hash) {
 		return bcrypt.compareSync(password, hash);
 	}
 

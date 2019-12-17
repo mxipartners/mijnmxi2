@@ -300,7 +300,7 @@ const createMxIAPI = function(resources) {
 				// Compare password hashes
 				var data = result.getData();
 				var generators = request.getResource("generators");
-				if(!generators.comparePasswordAndHash(password, data.passwordHash)) {
+				if(!generators.comparePasswordHash(password, data.passwordHash)) {
 					return Result.invalidData;	// Do not answer unauthorized because it would reveal to much info!
 				}
 

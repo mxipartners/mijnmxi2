@@ -44,9 +44,18 @@ class Request {
 
 		// Answer a copy of the parameters (to prevent changing its value,
 		// which has to be done explicitly through a call to addParameter())
-		// Parameters are a combination of path parameters and data (the later
-		// having precedence over the former).
-		return Object.assign({}, self._parameters, self._data);
+		// Parameters are a combination of path parameters and data (the former
+		// having precedence over the later).
+		return Object.assign({}, self._data, self._parameters);
+	}
+	getParameter(name) {
+		const self = this;
+
+		let value = self._data[name];
+		if(value === undefined) {
+			value = self._parameters[name];
+		}
+		return value;
 	}
 	setParameters(parameters) {
 		const self = this;
@@ -54,16 +63,6 @@ class Request {
 		// Replace all parameters
 		self._parameters = {};
 		Object.assign(self._parameters, parameters);
-	}
-	getParameter(name) {
-		const self = this;
-
-		// Answer single parameter
-		var value = self._data[name];
-		if(value === undefined) {
-			value = self._parameters[name];
-		}
-		return value;
 	}
 	addParameter(name, value) {
 		const self = this;
@@ -75,7 +74,7 @@ class Request {
 		const self = this;
 
 		// arguments does not have Array-like properties use old-fashioned for-loop
-		for(var i = 0; i < arguments.length; i++) {
+		for(let i = 0; i < arguments.length; i++) {
 			self.removeParameter(arguments[i]);
 		}
 	}
@@ -89,7 +88,7 @@ class Request {
 	setData(data) {
 		const self = this;
 
-		self._data = data;
+		self._data = data || {};
 	}
 	getResource(name) {
 		const self = this;
