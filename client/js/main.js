@@ -88,7 +88,15 @@ var app = {
 					showPage("editProject", d);
 				},
 				remove: function(d) {
-					notifyError("Not implemented yet");
+					var project = app.selections.project;
+					sendDeleteRequest("api/projects/" + project.id + "/members/" + d.id, function(error, data) {
+						if(error) {
+							notifyError(error);
+						} else {
+							notifyInfo("Gebruiker verwijderd als deelnemer");
+							showPage("project", project);
+						}
+					});
 				}
 			}
 		},
@@ -175,17 +183,21 @@ var app = {
 							whenDoneDo();
 						});
 					};
-					var saveMembers = function(users) {
+					var saveMembers = function(users, whenFinallyDoneDo) {
 						if(users.length > 0) {
 							var user = users.splice(0, 1)[0];
 							saveMember(user, function whenDoneDo() {
-								saveMembers(users);
+								saveMembers(users, whenFinallyDoneDo);
 							});
+						} else {
+							whenFinallyDoneDo();
 						}
 					};
 
 					// Start saving members
-					saveMembers(users);
+					saveMembers(users, function whenFinallyDoneDo() {
+						showPage("project");
+					});
 				}
 			}
 		},
