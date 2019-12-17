@@ -53,7 +53,7 @@ body {
 }
 
 .page .content {
-background-color: rgba(60, 50, 50, .1); /* debug */
+background-color: rgba(100, 255, 0, .1); /* debug */
 	position: absolute;
 	z-index: 2;
 	transition: left var(--ease), top var(--ease), width var(--ease), height var(--ease);
@@ -207,6 +207,7 @@ background-color: rgba(60, 50, 50, .1); /* debug */
 
 #login .credentials .entry,
 #profile .profile .entry,
+#member .members .entry,
 #project .project .entry {
 	flex: 3 1 auto;
 }
