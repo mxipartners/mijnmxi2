@@ -13,7 +13,7 @@
 		<meta name="msapplication-config" content="/icons/browserconfig.xml">
 		<meta name="theme-color" content="#ffffff">
 
-		<link rel="stylesheet" href="css/main.css"> 
+		<link rel="stylesheet" href="css/main.css">
 		<link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-touch-icon-57x57.png">
 		<link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-touch-icon-60x60.png">
 		<link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-touch-icon-72x72.png">
@@ -84,18 +84,20 @@
 			<h3>{{d.email}}</h3>
 			<a class="nav" href="#home">Terug</a>
 		</div>
-		<div id="profile" class="page">	
+		<div id="profile" class="page">
 			<h1>Profielpagina</h1>
 			<div class="profile">
 				<div class="entry border">
 					E-mailadres: <span>{{d.email}}</span>
-					<input id="shortNameInput" type="text" autocomplete="given-name" autofocus placeholder="Voornaam" data-prop-value="{{d.shortName}}">
-					<input id="fullNameInput" type="text" autocomplete="name" placeholder="Volledige naam" data-prop-value="{{d.name}}">
-					<input id="phoneNumberInput" type="text" autocomplete="tel" placeholder="Telefoonnummer" data-prop-value="{{d.phoneNumber}}">
-					<input id="skypeAddressInput" type="text" placeholder="Skype-adres" data-prop-value="{{d.skypeAddress}}">
+					<form action="">
+						<input id="shortNameInput" type="text" autocomplete="given-name" autofocus placeholder="Voornaam" data-prop-value="{{d.shortName}}">
+						<input id="fullNameInput" type="text" autocomplete="name" placeholder="Volledige naam" data-prop-value="{{d.name}}">
+						<input id="phoneNumberInput" type="text" autocomplete="tel" placeholder="Telefoonnummer" data-prop-value="{{d.phoneNumber}}">
+						<input id="skypeAddressInput" type="text" placeholder="Skype-adres" data-prop-value="{{d.skypeAddress}}">
+					</form>
 				</div>
 			</div>
-			<a class="action" href="#edit">Aanpassen</a>
+			<a class="action" href="#update">Aanpassen</a>
 			<a class="nav" href="#home">Terug</a>
 		</div>
 		<div id="login" class="page">
@@ -151,9 +153,9 @@
 				<label for="registerEmailInput">Email adres</label>
 				<input id="registerEmailInput" type="email" autocomplete="email" autofocus placeholder="gebruiker@organisatie.nl" required>
 				<label for="registerNewPasswordInput">Wachtwoord</label>
-				<input id="registerNewPasswordInput" type="password" autocomplete="new-password" required>
+				<input id="registerNewPasswordInput" type="password" autocomplete="new-password" minlength="6" required>
 				<label for="registerVerifyPasswordInput">Verificatie wachtwoord</label>
-				<input id="registerVerifyPasswordInput" type="password" autocomplete="new-password" required>
+				<input id="registerVerifyPasswordInput" type="password" autocomplete="new-password" minlength="6" required>
 			</form>
 			<a class="action" href="#register">Registreer</a>
 			<a class="nav" href="#home">Terug</a>

@@ -53,8 +53,8 @@ addStorageOperation("resetPassword", statements.SingleUpdateStatement,
 	"UPDATE users SET passwordHash = :passwordHash " +
 		"WHERE passwordResetToken = :passwordResetToken AND passwordResetExpiration >= :now"
 );
-addStorageOperation("resetPassword", statements.SingleUpdateStatement,
-	"UPDATE users SET passwordHash = :newPasswordHash " +
+addStorageOperation("updatePassword", statements.SingleUpdateStatement,
+	"UPDATE users SET passwordHash = :passwordHash " +
 		"WHERE id = :loginId"
 );
 addStorageOperation("updateUser", statements.SingleUpdateStatement,

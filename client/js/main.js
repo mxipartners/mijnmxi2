@@ -3,6 +3,10 @@ var ACTIVATION_CODE_KEY = "activationToken";
 var PASSWORD_RESET_CODE_KEY = "passwordResetToken";
 var EMPTY_FUNCTION = function() {};
 var HTTP_OK_NO_CONTENT = 204;
+var HTTP_ERROR_BAD_REQUEST = 400;
+var HTTP_ERROR_UNAUTHORIZED = 401;
+var HTTP_ERROR_NOT_FOUND = 404;
+var HTTP_ERROR_CONFLICT = 409;
 var MAX_VISIBLE_NOTIFICATIONS = 4;
 var NOTIFICATION_INFO = "info";
 var NOTIFICATION_ERROR = "error";
@@ -39,7 +43,7 @@ var app = {
 			beforeShow: function(pageElement) {
 				sendGetRequest("api/projects", function(error, data) {
 					if(error) {
-						console.error(error);
+						notifyError(error);
 					} else if(data) {
 						pageElement.render(data);
 					}
@@ -57,7 +61,7 @@ var app = {
 				}
 				sendGetRequest("api/projects/" + app.selections.projectId + "/members", function(error, data) {
 					if(error) {
-						console.error(error);
+						notifyError(error);
 					} else if(data) {
 						pageElement.render(data);
 					}
@@ -88,31 +92,27 @@ var app = {
 				}
 				sendGetRequest("api/users/" + app.selections.user.id, function(error, data) {
 					if(error) {
-						console.error(error);
+						notifyError(error);
 					} else if(data) {
 						pageElement.render(data);
 					}
 				});
 			},
 			actions: {
-				edit: function() {
+				update: function() {
 						var form = this.element.select("form");
 						if(!validateForm(form, true)) {
 							return;
 						}
-						var name = form.select("#fullNameInput").property("value");
-						var shortName = form.select("#shortNameInput").property("value");
-						var phoneNumber = form.select("#phoneNumberInput").property("value");
-						var skypeAddress = form.select("#skypeAddressInput").property("value");
-						var parameters = { 
-							name: name, 
-							shortName: shortName, 
-							phoneNumber: phoneNumber, 
-							skypeAddress: skypeAddress
-						};
-						sendPutRequest("api/users/" + app.selections.user.id, parameters, function(error, data) {
+						var input = extractInput({
+							name: "#fullNameInput",
+							shortName: "#shortNameInput",
+							phoneNumber: "#phoneNumberInput",
+							skypeAddress: "#skypeAddressInput"
+						});
+						sendPutRequest("api/users/" + app.selections.user.id, input, function(error, data) {
 						if(error) {
-							console.error(error);
+							notifyError(error);
 						} else if(data) {
 							window.alert("Gelukt!");
 						}
@@ -130,9 +130,11 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var email = form.select("#loginEmailInput").property("value");
-					var password = form.select("#loginPasswordInput").property("value");
-					sendPostRequest("api/sessions", { email: email, password: password }, function(error, data) {
+					var input = extractInput({
+						email: "#loginEmailInput",
+						password: "#loginPasswordInput"
+					});
+					sendPostRequest("api/sessions", input, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data && data.token) {
@@ -187,14 +189,21 @@ var app = {
 		// Password forgotten page
 		passwordForgotten: {
 			isUserRequired: false,
+			beforeShow: function() {
+				// Copy the email address already filled in on login screen
+				d3.select("#passwordForgottenEmailInput").property("value", d3.select("#loginEmailInput").property("value"));
+			},
 			actions: {
 				passwordForgotten: function() {
 					var form = this.element.select("form");
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var email = form.select("#loginEmailInput").property("value");
-					sendPatchRequest("api/users", { operation: "passwordForgotten", email: email }, function(error, data) {
+					var input = extractInput({
+						email: "#passwordForgottenEmailInput"
+					});
+					Object.assign(input, { operation: "sendPasswordResetMail" });
+					sendPatchRequest("api/users", input, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
@@ -224,14 +233,21 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var passwordResetToken = form.select("#passwordResetTokenInput").property("value");
-					var newPassword = form.select("#passwordInput").property("value");
-					var verifyPassword = form.select("#verifyPasswordInput").property("value");
-					if(newPassword !== verifyPassword) {
+					var input = extractInput({
+						passwordResetToken: "#passwordResetTokenInput",
+						password: "#passwordInput",
+						verifyPassword: "#verifyPasswordInput"
+					});
+
+					// Validate both passwords are equal (and remove verified password after use)
+					if(input.password !== input.verifyPassword) {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
 					}
-					sendPatchRequest("api/users", { operation: "resetPassword", passwordResetToken: passwordResetToken, password: newPassword }, function(error, data) {
+					delete input.verifyPassword;
+
+					Object.assign(input, { operation: "resetPassword" });
+					sendPatchRequest("api/users", input, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
@@ -255,14 +271,20 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var email = form.select("#registerEmailInput").property("value");
-					var newPassword = form.select("#registerNewPasswordInput").property("value");
-					var verifyPassword = form.select("#registerVerifyPasswordInput").property("value");
-					if(newPassword !== verifyPassword) {
+					var input = extractInput({
+						email: "#registerEmailInput",
+						password: "#registerNewPasswordInput",
+						verifyPassword: "#registerVerifyPasswordInput"
+					});
+
+					// Validate both passwords are equal (and remove verified password after use)
+					if(input.password !== input.verifyPassword) {
 						notifyInvalidForm(form, "Wachtwoorden zijn niet hetzelfde");
 						return;
 					}
-					sendPostRequest("api/users", { email: email, password: newPassword }, function(error, data) {
+					delete input.verifyPassword;
+
+					sendPostRequest("api/users", input, function(error, data) {
 						if(error) {
 							if(error.status === 409) {
 								notifyError("Een account met opgegeven mail-adres bestaat al.");
@@ -294,8 +316,11 @@ var app = {
 					if(!validateForm(form, true)) {
 						return;
 					}
-					var activationToken = form.select("#activationTokenInput").property("value");
-					sendPatchRequest("api/users", { operation: "activate", activationToken: activationToken }, function(error, data) {
+					var input = extractInput({
+						activationToken: "#activationTokenInput"
+					});
+					Object.assign(input, { operation: "activate" });
+					sendPatchRequest("api/users", input, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
@@ -341,15 +366,31 @@ function loadUser() {
 	// Load current user
 	sendGetRequest("api/users/" + userId, function(error, data) {
 		if(error) {
-			console.error(error);
+			notifyError(error);
 		} else if(data) {
 			if(data.id === userId) {
 				app.selections.user = data;
 			} else {
-				console.error("Retrieved incorrect user info!");
+				notifyError("Gebruikersinformatie kan niet ingelezen worden");
 			}
 		}
 	});
+}
+
+// Input retrieval
+function extractInput(descriptor) {
+	var input = {};
+	Object.keys(descriptor).forEach(function(key) {
+		var valueHolder = d3.select(descriptor[key]);
+		if(valueHolder.attr("type") === "checkbox") {
+			input[key] = valueHolder.property("checked") ? 1 : 0;
+		} else {
+			// This works for input, textarea and select
+			input[key] = valueHolder.property("value");
+		}
+	});
+
+	return input;
 }
 
 // Send API request

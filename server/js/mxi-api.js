@@ -5,6 +5,9 @@ const HTTP_POST = "POST";
 const HTTP_PUT = "PUT";
 const HTTP_PATCH = "PATCH";
 const HTTP_DELETE = "DELETE";
+const LOG_LEVEL_ALL = 0;
+const LOG_LEVEL_SECURE = 1;
+const LOG_LEVEL_NONE = 2;
 const MINIMAL_PASSWORD_LENGTH = 6;
 const ACTIVATION_TOKEN_LENGTH = 64;
 const ACTIVATION_EXPIRATION_HOURS = 1;
@@ -148,7 +151,7 @@ const createMxIAPI = function(resources) {
 				validation = validators.validateParameters(request.getParameters(), {
 					operation: "fixed:activate",
 					activationToken: "string:" + (ACTIVATION_TOKEN_LENGTH * 2) + "," + (ACTIVATION_TOKEN_LENGTH * 2)
-				});
+				}, LOG_LEVEL_NONE);
 				if(validation) {
 					request.removeParameter("operation");
 
@@ -163,7 +166,7 @@ const createMxIAPI = function(resources) {
 				validation = validators.validateParameters(request.getParameters(), {
 					operation: "fixed:sendPasswordResetMail",
 					email: "email"
-				});
+				}, LOG_LEVEL_NONE);
 				if(validation) {
 					request.removeParameter("operation");
 
@@ -195,8 +198,7 @@ const createMxIAPI = function(resources) {
 					operation: "fixed:resetPassword",
 					passwordResetToken: "string:" + (PASSWORD_RESET_TOKEN_LENGTH * 2) + "," + (PASSWORD_RESET_TOKEN_LENGTH * 2),
 					password: "string:" + MINIMAL_PASSWORD_LENGTH
-					
-				});
+				}, LOG_LEVEL_NONE);
 				if(validation) {
 					request.removeParameter("operation");
 
@@ -252,7 +254,7 @@ const createMxIAPI = function(resources) {
 				var validation = validators.validateParameters(request.getParameters(), {
 					id: "id",
 					name: "string",
-					shortName: "string", 
+					shortName: "string",
 					phoneNumber: "string",
 					skypeAddress: "string"
 				});
@@ -263,7 +265,7 @@ const createMxIAPI = function(resources) {
 				// Add user to request
 				request.addParameter("loginId", request.getResource("user").id);
 
-				// Update user 
+				// Update user
 				return request.getResource("dataStore").updateUser(request.getParameters());
 			}
 		}
