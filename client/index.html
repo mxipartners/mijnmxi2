@@ -60,7 +60,7 @@
 				<!-- This tag is intentionally left blank -->
 			</div>
 			<div class="content">
-				<h3>Projecten pagina</h3>
+				<h3>Overzicht Projecten</h3>
 				<ul data-repeat="{{d}}">
 					<li><a class="action" href="#showProject">{{d.name}}</a> <a class="action" href="#removeMe">Remove me</a></li>
 				</ul>
@@ -89,11 +89,13 @@
 			</div>
 		</div>
 		<div id="editProject" class="page">
-			<h1>Projectpagina</h1>
+			<h1>Nieuw project toevoegen</h1>
 			<div class="project">
 				<div class="entry border">
 					<form action="">
 						<input id="projectNameInput" type="text" autocomplete="off" autofocus placeholder="Projectnaam" data-prop-value="{{d.name}}">
+						<p></p>
+						<input id="projectDescriptionInput" type="text" autocomplete="off" autofocus placeholder="Projectomschrijving" data-prop-value="{{d.description}}">
 					</form>
 				</div>
 			</div>
@@ -118,23 +120,26 @@
 			<div data-import="{{'#first-dial-buttons'}}">
 				<!-- This tag is intentionally left blank -->
 			</div>
-			<div style="padding-left: 50px;">
-			<h3>Deelnemers pagina</h3>
-			<ul data-repeat="{{d}}">
-				<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
-			</ul>
-			<a class="nav" href="#home">Terug</a>
+			<div class="content">
+				<h3>Deelnemers pagina</h3>
+				<ul data-repeat="{{d}}">
+					<li><span>{{d.name}}</span> - <span>{{d.email}}</span></li>
+				</ul>
+				<a class="nav" href="#home">Terug</a>
 			</div>
 			<div data-import="{{'#second-dial-buttons'}}">
 				<!-- This tag is intentionally left blank -->
 			</div>
 		</div>
 		<div id="member" class="page">
-			Deelnemer pagina
+			<div data-import="{{'#first-dial-buttons'}}"></div>
+			<div class="content">
+			Deelnemer pagina - test
 			<h1>{{d.name}}</h1>
 			<h3>{{d.shortName}}</h3>
 			<h3>{{d.email}}</h3>
 			<a class="nav" href="#home">Terug</a>
+			</div>
 		</div>
 		<div id="profile" class="page">
 			<h1>Profielpagina</h1>

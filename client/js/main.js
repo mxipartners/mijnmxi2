@@ -194,11 +194,11 @@ var app = {
 		members: {
 			isUserRequired: true,
 			beforeShow: function(pageElement) {
-				if(!app.selections.projectId) {
+				if(!app.selections.project) {
 					console.error("No project selected!");
 					return;
 				}
-				sendGetRequest("api/projects/" + app.selections.projectId + "/members", function(error, data) {
+				sendGetRequest("api/projects/" + app.selections.project.id + "/members", function(error, data) {
 					if(error) {
 						notifyError(error);
 					} else if(data) {
