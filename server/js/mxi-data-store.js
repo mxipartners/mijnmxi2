@@ -82,7 +82,7 @@ addStorageOperation("getAllUsers", statements.MultiReadStatement,
 );
 addStorageOperation("addProject", statements.SingleCreateStatement,
 	"INSERT INTO projects (userId, name) " +
-		"VALUES (:loginId, :name)"
+		"VALUES (:userId, :name)"
 );
 addStorageOperation("deleteSession", statements.SingleDeleteStatement,
 	"DELETE FROM sessions WHERE token = :token"
@@ -95,8 +95,8 @@ addStorageOperation("getProject", statements.SingleReadStatement,
 		"WHERE id = :id AND userId = :loginId"
 );
 addStorageOperation("getAllProjects", statements.MultiReadStatement,
-	"SELECT id, name FROM projects " +
-		"WHERE userId = :loginId"
+	"SELECT projects.id, name, members.id AS memberMeId FROM projects, members " +
+		"WHERE projects.id = members.projectId AND members.userId = :loginId"
 );
 addStorageOperation("updateProject", statements.SingleUpdateStatement,
 	"UPDATE projects SET name = :name " +
@@ -107,15 +107,22 @@ addStorageOperation("deleteProject", statements.SingleDeleteStatement,
 );
 addStorageOperation("addProjectMember", statements.SingleCreateStatement,
 	"INSERT INTO members (userId, projectId) " +
-		"VALUES (:userId, (SELECT id FROM projects WHERE id = :projectId AND userId = :loginId))"
+		"VALUES (" +
+			"(CASE " +
+				"WHEN (EXISTS (SELECT id FROM members WHERE userId = :userId AND projectId = :projectId)) THEN NULL " +
+				"ELSE :userId " +
+			"END), " + 
+			":projectId" +
+		")"
 );
 addStorageOperation("getAllProjectMembers", statements.MultiReadStatement,
-	"SELECT id, userId, projectId FROM members " +
-		"WHERE projectId = :projectId AND :loginId IN (SELECT userId FROM projects WHERE id = :projectId)"
+	"SELECT members.id, userId, projectId, shortName, name FROM members, users " +
+		"WHERE projectId = :projectId AND :loginId IN (SELECT userId FROM projects WHERE id = :projectId) AND " +
+			"users.id = members.userId"
 );
 addStorageOperation("deleteProjectMember", statements.SingleDeleteStatement,
 	"DELETE FROM members " +
-		"WHERE id = :id AND :loginId IN (SELECT userId FROM projects WHERE id = :projectId)"
+		"WHERE id = :memberId AND projectId = :projectId"
 );
 
 // Helper function to create data store statements

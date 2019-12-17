@@ -53,6 +53,16 @@ var app = {
 				showProject: function(d) {
 					app.selections.project = d;
 					showPage("project", d);
+				},
+				removeMe: function(d) {
+					sendDeleteRequest("api/projects/" + d.id + "/members/" + d.memberMeId, function(error, data) {
+						if(error) {
+							notifyError(error);
+						} else {
+							notifyInfo("Je bent verwijderd als deelnemer");
+							showPage("projects");
+						}
+					});
 				}
 			}
 		},
@@ -61,6 +71,7 @@ var app = {
 		project: {
 			isUserRequired: true,
 			beforeShow: function(pageElement, project) {
+				project = project || app.selections.project;
 				sendGetRequest("api/projects/" + project.id + "/members", function(error, data) {
 					if(error) {
 						notifyError(error);
@@ -75,6 +86,9 @@ var app = {
 					app.selections.project = d;
 					app.selections.projectId = d.id;
 					showPage("editProject", d);
+				},
+				remove: function(d) {
+					notifyError("Not implemented yet");
 				}
 			}
 		},
@@ -125,13 +139,53 @@ var app = {
 					if(error) {
 						notifyError(error);
 					} else if(data) {
+						data = data.filter(function(user) {
+							return app.selections.project.members.findIndex(function(projectMember) {
+								return projectMember.userId === user.id;
+							}) < 0;
+						});
 						pageElement.render(data);
 					}
 				});
 			},
 			actions: {
 				save: function(d) {
-					notifyError("Not implemented yet");
+					var selectedOptions = d3.select("#memberSelection").property("selectedOptions");
+					var users = [];
+					for(var i = 0; i < selectedOptions.length; i++) {
+						users.push(d3.select(selectedOptions[i]).datum());
+					}
+					var project = app.selections.project;
+
+					// Create two helpers functions to save members one-by-one (because of async nature REST API calls)
+					var saveMember = function(user, whenDoneDo) {
+						var member = {
+							userId: user.id
+						};
+						sendPostRequest("api/projects/" + project.id + "/members", member, function(error, data) {
+							if(error) {
+								if(error.status === HTTP_ERROR_CONFLICT) {
+									notifyError("Gebruiker " + user.name + " is al deelnemer van dit project");
+								} else {
+									notifyError(error);
+								}
+							} else if(data) {
+								notifyInfo("Deelnemer " + user.name + " toegevoegd");
+							}
+							whenDoneDo();
+						});
+					};
+					var saveMembers = function(users) {
+						if(users.length > 0) {
+							var user = users.splice(0, 1)[0];
+							saveMember(user, function whenDoneDo() {
+								saveMembers(users);
+							});
+						}
+					};
+
+					// Start saving members
+					saveMembers(users);
 				}
 			}
 		},

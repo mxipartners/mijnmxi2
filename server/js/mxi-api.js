@@ -425,10 +425,25 @@ const createMxIAPI = function(resources) {
 				}
 
 				// Add user to request
-				request.addParameter("loginId", request.getResource("user").id);
+				request.addParameter("userId", request.getResource("user").id);
 
-				// Retrieve all projects
-				return request.getResource("dataStore").addProject(request.getParameters());
+				// Add new projects
+				var dataStore = request.getResource("dataStore");
+				var result = dataStore.addProject(request.getParameters());
+				if(!result.isOk()) {
+					return result;
+				}
+
+				// Add user as member of project
+				var parameters = {
+					userId: request.getResource("user").id,
+					projectId: result.getData().id
+				};
+				if(!dataStore.addProjectMember(parameters).isOk()) {
+					return Result.invalidData;
+				}
+
+				return result;
 			}
 		}
 	]
