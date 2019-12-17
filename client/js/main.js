@@ -340,6 +340,21 @@ var app = {
 	actions: {
 		dial: function() {
 			notifyError("Not implemented yet");
+		},
+		logout: function() {
+			showPage("logout");
+		},
+		me: function() {
+			notifyError("Not implemented yet");
+		},
+		message: function() {
+			notifyError("Not implemented yet");
+		},
+		call: function() {
+			notifyError("Not implemented yet");
+		},
+		add: function() {
+			notifyError("Not implemented yet");
 		}
 	},
 
@@ -670,6 +685,11 @@ function initializeAfterLoad() {
 
 	// Add event handlers for main functions
 	d3.select("#dial-button").on("click", app.actions.dial);
+	d3.select("#logout-button").on("click", app.actions.logout);
+	d3.select("#me-button").on("click", app.actions.me);
+	d3.select("#message-button").on("click", app.actions.message);
+	d3.select("#call-button").on("click", app.actions.call);
+	d3.select("#add-button").on("click", app.actions.add);
 
 	// Add event handlers to navigation links (this is independent of location of links)
 	d3.selectAll("a.nav").each(function() {
