@@ -48,17 +48,56 @@ var app = {
 						pageElement.render(data);
 					}
 				});
+			},
+			actions: {
+				addElement: function() {
+					app.selections.project = {
+						id: null, 
+						name: ""
+					};
+					showPage("project");
+				}
 			}
 		},
 
-		// Project page
-		editProject: {
+		// Project page showing one single project
+		project: {
 			isUserRequired: true,
 			beforeShow: function(pageElement, data) {
-				pageElement.render(data);
+				pageElement.render(data || app.selections.project);
+			},
+			actions: {
+				save: function(d) {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var input = extractInput({
+						name: "#projectNameInput"
+					});
+					if(!d.id){
+						sendPostRequest("api/projects", input, function(error, data) {
+							if(error) {
+								notifyError(error);
+							} else if(data) {
+								d.id = data.id;
+								notifyInfo("Project succesvol opgeslagen");
+							}
+						});
+					} else {
+						sendPutRequest("api/projects/" + d.id, input, function(error, data) {
+							if(error) {
+								notifyError(error);
+							} else if(data) {
+								Object.assign(d, input);
+								notifyInfo("Project succesvol opgeslagen");
+							}
+						});
+					}
+				}
 			}
 		},
-
+		
 		// Members page showing all members of the currently selected project
 		members: {
 			isUserRequired: true,
@@ -108,26 +147,26 @@ var app = {
 			},
 			actions: {
 				update: function() {
-						var form = this.element.select("form");
-						if(!validateForm(form, true)) {
-							return;
-						}
-						var input = extractInput({
-							name: "#fullNameInput",
-							shortName: "#shortNameInput",
-							phoneNumber: "#phoneNumberInput",
-							skypeAddress: "#skypeAddressInput"
-						});
-						sendPutRequest("api/users/" + app.selections.user.id, input, function(error, data) {
+					var form = this.element.select("form");
+					if(!validateForm(form, true)) {
+						return;
+					}
+					var input = extractInput({
+						name: "#fullNameInput",
+						shortName: "#shortNameInput",
+						phoneNumber: "#phoneNumberInput",
+						skypeAddress: "#skypeAddressInput"
+					});
+					sendPutRequest("api/users/" + app.selections.user.id, input, function(error, data) {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
 							window.alert("Gelukt!");
 						}
 					});
-					}
 				}
 			},
+		},
 
 		// Login page
 		login: {
@@ -363,7 +402,7 @@ var app = {
 		},
 		add: function() {
 			if(app.activePageId === "projects") {
-				showPage("editProject", { name: "Nieuw project" });
+				showPage("project", { name: "Nieuw project" });
 			}
 		}
 	},
@@ -445,7 +484,7 @@ function sendDeleteRequest(url, callback) {
 function sendAPIRequest(url, method, requestData, callback) {
 	var sessionToken = "";
 	if(app.session) {
-		sessionToken =  app.session.token || "";
+		sessionToken = app.session.token || "";
 	}
 	fetch(url, {
 		method: method,
@@ -755,8 +794,8 @@ function initializeAfterLoad() {
 				}
 
 				// Add event handler
-				linkElement.on("click", function() {
-					action();
+				linkElement.on("click", function(d) {
+					action(d);
 					stopEventFully();
 				});
 			}
