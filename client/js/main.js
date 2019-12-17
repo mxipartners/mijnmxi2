@@ -50,21 +50,40 @@ var app = {
 				});
 			},
 			actions: {
-				addElement: function() {
-					app.selections.project = {
-						id: null, 
-						name: ""
-					};
-					showPage("project");
+				showProject: function(d) {
+					app.selections.project = d;
+					showPage("project", d);
 				}
 			}
 		},
 
-		// Project page showing one single project
+		// Project page for showing project
 		project: {
 			isUserRequired: true,
-			beforeShow: function(pageElement, data) {
-				pageElement.render(data || app.selections.project);
+			beforeShow: function(pageElement, project) {
+				sendGetRequest("api/projects/" + project.id + "/members", function(error, data) {
+					if(error) {
+						notifyError(error);
+					} else if(data) {
+						project.members = data;
+						pageElement.render(project);
+					}
+				});
+			},
+			actions: {
+				edit: function(d) {
+					app.selections.project = d;
+					app.selections.projectId = d.id;
+					showPage("editProject", d);
+				}
+			}
+		},
+
+		// Project page for editing project
+		editProject: {
+			isUserRequired: true,
+			beforeShow: function(pageElement, project) {
+				pageElement.render(project || app.selections.project);
 			},
 			actions: {
 				save: function(d) {
@@ -75,7 +94,7 @@ var app = {
 					var input = extractInput({
 						name: "#projectNameInput"
 					});
-					if(!d.id){
+					if(!d.id) {
 						sendPostRequest("api/projects", input, function(error, data) {
 							if(error) {
 								notifyError(error);
@@ -94,6 +113,25 @@ var app = {
 							}
 						});
 					}
+				}
+			}
+		},
+
+		// Select members for a project
+		selectMembers: {
+			isUserRequired: true,
+			beforeShow: function(pageElement) {
+				sendGetRequest("api/users", function(error, data) {
+					if(error) {
+						notifyError(error);
+					} else if(data) {
+						pageElement.render(data);
+					}
+				});
+			},
+			actions: {
+				save: function(d) {
+					notifyError("Not implemented yet");
 				}
 			}
 		},
@@ -402,7 +440,9 @@ var app = {
 		},
 		add: function() {
 			if(app.activePageId === "projects") {
-				showPage("project", { name: "Nieuw project" });
+				showPage("editProject", { name: "Nieuw project" });
+			} else if(app.activePageId === "project") {
+				showPage("selectMembers");
 			}
 		}
 	},
@@ -803,10 +843,6 @@ function initializeAfterLoad() {
 	});
 
 	// Add event handlers to list items
-	d3.select("#projects li").on("click", function(d) {
-		app.selections.projectId = d.id;
-		showPage("members");
-	});
 	d3.select("#members li").on("click", function(d) {
 		app.selections.memberId = d.id;
 		showPage("member");

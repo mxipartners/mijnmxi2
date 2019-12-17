@@ -97,6 +97,25 @@ const createMxIAPI = function(resources) {
 	path: "/api/users",
 	operations: [
 		{
+			method: HTTP_GET,
+			authorization: hasSession,
+			action: function(request) {
+
+				// Validate input
+				var validators = request.getResource("validators");
+				var validation = validators.validateEmpty(request.getParameters());
+				if(!validation) {
+					return Result.invalidData;
+				}
+
+				// Add user to request
+				request.addParameter("loginId", request.getResource("user").id);
+
+				// Retrieve all projects
+				return request.getResource("dataStore").getAllUsers(request.getParameters());
+			}
+		},
+		{
 			method: HTTP_POST,
 			authorization: true,	// Allow all
 			action: function(request) {
@@ -484,7 +503,7 @@ const createMxIAPI = function(resources) {
 	]
 },
 {
-	path: "/api/projects/:id/members",
+	path: "/api/projects/:projectId/members",
 	operations: [
 		{
 			method: HTTP_GET,
@@ -494,7 +513,7 @@ const createMxIAPI = function(resources) {
 				// Validate input
 				var validators = request.getResource("validators");
 				var validation = validators.validateParameters(request.getParameters(), {
-					id: "id"
+					projectId: "id"
 				});
 				if(!validation) {
 					return Result.invalidData;
@@ -532,7 +551,7 @@ const createMxIAPI = function(resources) {
 	]
 },
 {
-	path: "/api/projects/:projectId/members/:id",
+	path: "/api/projects/:projectId/members/:memberId",
 	operations: [
 		{
 			method: HTTP_DELETE,
@@ -542,8 +561,8 @@ const createMxIAPI = function(resources) {
 				// Validate input
 				var validators = request.getResource("validators");
 				var validation = validators.validateParameters(request.getParameters(), {
-					id: "id",
-					projectId: "id"
+					projectId: "id",
+					memberId: "id"
 				});
 				if(!validation) {
 					return Result.invalidData;

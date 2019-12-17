@@ -77,6 +77,9 @@ addStorageOperation("addSession", statements.SingleCreateStatement,
 addStorageOperation("updateSession", statements.SingleUpdateStatement,
 	"UPDATE sessions SET expiration = :expiration WHERE token = :token AND expiration >= :now"
 );
+addStorageOperation("getAllUsers", statements.MultiReadStatement,
+	"SELECT id, name, shortName FROM users"
+);
 addStorageOperation("addProject", statements.SingleCreateStatement,
 	"INSERT INTO projects (userId, name) " +
 		"VALUES (:loginId, :name)"

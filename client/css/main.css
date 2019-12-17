@@ -107,16 +107,19 @@ background-color: rgba(60, 50, 50, .1); /* debug */
 
 	/* Page specific - projects & members */
 	#projects > div:first-child .buttons,
+	#project > div:first-child .buttons,
 	#members > div:first-child .buttons {
 		left: 0;
 		top: 0;
 	}
 	#projects > div:last-child .buttons,
+	#project > div:last-child .buttons,
 	#members > div:last-child .buttons {
 		left: calc(100% - var(--button-group-size));
 		top: 0;
 	}
 	#projects .content,
+	#project .content,
 	#members .content {
 		left: var(--button-group-size);
 		top: 0;
@@ -158,16 +161,19 @@ background-color: rgba(60, 50, 50, .1); /* debug */
 
 	/* Page specific - projects & members */
 	#projects > div:first-child .buttons,
+	#project > div:first-child .buttons,
 	#members > div:first-child .buttons {
 		left: 0;
 		top: 0;
 	}
 	#projects > div:last-child .buttons,
+	#project > div:last-child .buttons,
 	#members > div:last-child .buttons {
 		left: 0;
 		top: calc(100% - var(--button-group-size));
 	}
 	#projects .content,
+	#project .content,
 	#members .content {
 		left: 0;
 		top: var(--button-group-size);
@@ -230,6 +236,19 @@ input {
 	color: var(--input-text-color);
 	background-color: var(--input-background-color);
 	box-shadow: none;
+}
+
+input::-webkit-input-placeholder {
+	color: #bbb;
+}
+input:-moz-placeholder {
+	color: #bbb;
+}
+input::-moz-placeholder {
+	color: #bbb;
+}
+input:-ms-input-placeholder {
+	color: #bbb;
 }
 
 input[type="password"] {

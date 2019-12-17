@@ -60,14 +60,27 @@
 			<div class="content">
 				<h3>Projecten pagina</h3>
 				<ul data-repeat="{{d}}">
-					<li>{{d.name}}</li>
+					<li><a class="action" href="#showProject">{{d.name}}</a></li>
 				</ul>
-				<a href="#addElement" class="action">Voeg toe</a>
 				<a class="nav" href="#home">Terug</a>
 			</div>
 			<div data-import="{{'#second-dial-buttons'}}"></div>
 		</div>
 		<div id="project" class="page">
+			<div data-import="{{'#first-dial-buttons'}}"></div>
+			<div class="content">
+				<h1>Projectpagina</h1>
+				<div class="project">
+					<ul data-repeat="{{d.members}}">
+						<li>{{d.name}}</li>
+					</ul>
+				</div>
+				<a class="action" href="#edit">Aanpassen</a>
+				<a class="nav" href="#home">Terug</a>
+			</div>
+			<div data-import="{{'#second-dial-buttons'}}"></div>
+		</div>
+		<div id="editProject" class="page">
 			<h1>Projectpagina</h1>
 			<div class="project">
 				<div class="entry border">
@@ -78,6 +91,18 @@
 			</div>
 			<a class="action" href="#save">Opslaan</a>
 			<a class="nav" href="#home">Terug</a>
+		</div>
+		<div id="selectMembers" class="page">
+			<h1>Kies projectleden</h1>
+			<div class="members">
+				<div class="entry border">
+					<form action="">
+						{{JSON.stringify(d)}}
+					</form>
+				</div>
+			</div>
+			<a class="action" href="#save">Opslaan</a>
+			<a class="nav" href="#project">Terug</a>
 		</div>
 		<div id="members" class="page">
 			<div data-import="{{'#first-dial-buttons'}}"></div>
