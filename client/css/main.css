@@ -251,6 +251,105 @@ a.action {
 */
 }
 
+/* Notifications */
+#notifications {
+	display: block;
+	position: absolute;
+	z-index: 10;
+	top: .4em;
+	right: .4em;
+	width: 30em;
+	max-width: 60%;
+	overflow: hidden;
+}
+
+#notifications .close {
+	display: inline-block;
+	position: absolute;
+	left: 5px;
+	cursor: pointer;
+}
+
+#notifications .empty .close,
+#notifications .hidden .close {
+	display: none;
+}
+
+#notifications .notification {
+	position: relative;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-bottom: 2px;
+	height: 4.7em;
+	border-radius: 8px;
+	color: rgba(255, 255, 255, 1);
+	overflow: hidden;
+
+	-webkit-transition: height .5s ease .1s, padding-top .5s ease .1s, padding-bottom .5s ease .1s, padding-right .5s ease .1s, color .5s ease .1s;
+	-moz-transition: height .5s ease .1s, padding-top .5s ease .1s, padding-bottom .5s ease .1s, padding-right .5s ease .1s, color .5s ease .1s;
+	-ms-transition: height .5s ease .1s, padding-top .5s ease .1s, padding-bottom .5s ease .1s, padding-right .5s ease .1s, color .5s ease .1s;
+	-o-transition: height .5s ease .1s, padding-top .5s ease .1s, padding-bottom .5s ease .1s, padding-right .5s ease .1s, color .5s ease .1s;
+	transition: height .5s ease .1s, padding-top .5s ease .1s, padding-bottom .5s ease .1s, padding-right .5s ease .1s, color .5s ease .1s;
+}
+
+#notifications .notification.empty,
+#notifications .notification.hidden {
+	height: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	color: rgba(255, 255, 255, 0);
+}
+
+#notifications .notification.info {
+	background-color: rgba(0, 255, 0, .8);
+	color: #333;
+}
+
+#notifications .notification.error {
+	background-color: rgba(255, 0, 0, .8);
+	color: #fff;
+}
+
+#notifications .notification.empty,
+#notifications .notification.hidden {
+	background-color: rgba(200, 200, 200, .8);
+}
+
+#notifications .notification .count {
+	display: block;
+	line-height: 1.8em;
+	position: absolute;
+	border-radius: 1em;
+	width: 2em;
+	height: 2em;
+	top: .4em;
+	right: .4em;
+	background-color: rgba(0, 0, 0, .1);
+	color: #fff;
+	text-align: center;
+}
+#notifications .notification .count:empty {
+	display: none;
+}
+
+#notifications .notification .content {
+	display: inline-block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#notifications .notification.multi {
+	padding-right: 4em;
+}
+
+#notifications .timestamp {
+	font-size: .7em;
+	color: #333;
+}
+
 /* Display a block (div) bordered (yellow/orange) */
 .border {
 	border-width: 2px;

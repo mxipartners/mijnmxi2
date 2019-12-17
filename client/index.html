@@ -39,14 +39,14 @@
 	<body>
 		<div id="templates">
 			<div id="first-dial-buttons" class="buttons x2">
-				<img class="button" src="/images/callmxi-button.svg" alt="M&I/Partners bellen">
-				<img class="button" src="/images/logout-button.svg" alt="Afsluiten">
+				<img id="dial-button" class="button" src="/images/callmxi-button.svg" alt="M&I/Partners bellen">
+				<img id="logout-button" class="button" src="/images/logout-button.svg" alt="Afsluiten">
 			</div>
 			<div id="second-dial-buttons" class="buttons x4">
-				<img class="button" src="/images/me-button.svg" alt="Mij tonen">
-				<img class="button" src="/images/message-button.svg" alt="Bericht sturen">
-				<img class="button" src="/images/call-button.svg" alt="Opbellen">
-				<img class="button" src="/images/add-button.svg" alt="Item toevoegen">
+				<img id="me-button" class="button" src="/images/me-button.svg" alt="Mij tonen">
+				<img id="message-button" class="button" src="/images/message-button.svg" alt="Bericht sturen">
+				<img id="call-button" class="button" src="/images/call-button.svg" alt="Opbellen">
+				<img id="add-button" class="button" src="/images/add-button.svg" alt="Item toevoegen">
 			</div>
 		</div>
 		<div id="home" class="page">
@@ -183,6 +183,16 @@
 			</form>
 			<a class="action" href="#activate">Activeer</a>
 			<a class="nav" href="#home">Terug</a>
+		</div>
+		<div id="notifications">
+			<div data-repeat="{{app.notifications}}">
+				<div data-attr-class="{{`notification ${d.visualType} ${d.count !== 1 ? 'multi' : ''}`}}">
+					<span class="close" data-index="{{i}}">x</span>
+					<span class="content">{{d.message}}</span>
+					<span class="timestamp">{{formattedNotificationTimestamp(d.timestamp)}}</span>
+					<span class="count">{{d.count > 1 ? (d.count > 9 ? "9+" : d.count + "x") : null}}</span>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

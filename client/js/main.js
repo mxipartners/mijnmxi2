@@ -3,6 +3,11 @@ var ACTIVATION_CODE_KEY = "activationToken";
 var PASSWORD_RESET_CODE_KEY = "passwordResetToken";
 var EMPTY_FUNCTION = function() {};
 var HTTP_OK_NO_CONTENT = 204;
+var MAX_VISIBLE_NOTIFICATIONS = 4;
+var NOTIFICATION_INFO = "info";
+var NOTIFICATION_ERROR = "error";
+var NOTIFICATION_EMPTY = "empty";
+var UPDATE_NOTIFICATION_FREQUENCY = 5000;
 
 // Globals
 var app = {
@@ -136,7 +141,7 @@ var app = {
 							}
 							showPage("home");
 						} else {
-							window.alert("De ingevoerde logingegevens kloppen niet!");
+							notifyError("De ingevoerde logingegevens kloppen niet!");
 						}
 					});
 				},
@@ -187,11 +192,11 @@ var app = {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
-							window.alert("Een mail is verzonden met uw wachtwoordherstelcode!");
+							notifyInfo("Een mail is verzonden met uw wachtwoordherstelcode!");
 							removeSearchParametersFromURL();
 							showPage("resetPassword");
 						} else {
-							window.alert("Account kon niet geactiveerd worden.");
+							notifyError("Account kon niet geactiveerd worden.");
 						}
 					});
 				}
@@ -224,11 +229,11 @@ var app = {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
-							window.alert("Wachtwoord is succesvol gewijzigd!");
+							notifyInfo("Wachtwoord is succesvol gewijzigd!");
 							removeSearchParametersFromURL();
 							showPage("home");
 						} else {
-							window.alert("Het nieuwe wachtwoord kon niet goed geregistreerd worden.");
+							notifyError("Het nieuwe wachtwoord kon niet goed geregistreerd worden.");
 						}
 					});
 				}
@@ -254,14 +259,14 @@ var app = {
 					sendPostRequest("api/users", { email: email, password: newPassword }, function(error, data) {
 						if(error) {
 							if(error.status === 409) {
-								window.alert("Een account met opgegeven mail-adres bestaat al.");
+								notifyError("Een account met opgegeven mail-adres bestaat al.");
 							} else {
 								notifyError(error);
 							}
 						} else if(data) {
-							window.alert("Account is geregistreerd. Een mail met activatiecode is verzonden naar het opgegeven mail-adres.");
+							notifyInfo("Account is geregistreerd. Een mail met activatiecode is verzonden naar het opgegeven mail-adres.");
 						} else {
-							window.alert("Het account kon niet geregistreerd worden. Controleer de gegevens en probeer opnieuw.");
+							notifyError("Het account kon niet geregistreerd worden. Controleer de gegevens en probeer opnieuw.");
 						}
 					});
 				}
@@ -288,11 +293,11 @@ var app = {
 						if(error) {
 							notifyError(error);
 						} else if(data) {
-							window.alert("Account is succesvol geactiveerd!");
+							notifyInfo("Account is succesvol geactiveerd!");
 							removeSearchParametersFromURL();
 							showPage("home");
 						} else {
-							window.alert("Account kon niet geactiveerd worden.");
+							notifyError("Account kon niet geactiveerd worden.");
 						}
 					});
 				}
@@ -300,11 +305,22 @@ var app = {
 		}
 	},
 
+	// Main actions
+	actions: {
+		dial: function() {
+			notifyError("Not implemented yet");
+		}
+	},
+
 	// Session
 	session: { token: undefined },
 
 	// Selections
-	selections: {}
+	selections: {},
+
+	// Notifications
+	notifications: [],
+	notificationUpdater: null
 };
 
 // Specific API calls
@@ -426,6 +442,139 @@ function showPage(id) {
 	page.afterShow(pageElement);
 }
 
+// Notification functions
+function addNotification(notification) {
+	var index = app.notifications.findIndex(function(existingNotification) {
+		return existingNotification.message === notification.message;
+	});
+	if(index >= 0) {
+
+		// Update existing notification
+		app.notifications[index].count++;
+		app.notifications[index].timestamp = Date.now();
+		if(app.notifications[index].timeout && notification.timeout) {
+			app.notifications[index].timeout = notification.timeout;
+		}
+	} else {
+
+		// Create new notification
+		notification.count = 1;
+		notification.timestamp = Date.now();
+		app.notifications.push(notification);
+	}
+	renderNotifications();
+}
+
+function removeNotification(index) {
+	app.notifications[index].type = NOTIFICATION_EMPTY;
+	renderNotifications();
+}
+
+function removeAllNotifications() {
+	app.notifications.forEach(function(existingNotification) {
+		existingNotification.type = NOTIFICATION_EMPTY;
+	});
+	renderNotifications();
+}
+
+function renderNotifications() {
+
+	// Check which notifications have expired
+	var now = Date.now();
+	app.notifications.forEach(function(existingNotification) {
+		if(now >= existingNotification.timestamp + existingNotification.timeout) {
+			existingNotification.type = NOTIFICATION_EMPTY;
+		}
+	});
+
+	// Make only top most visible
+	var lastIndex = app.notifications.length - MAX_VISIBLE_NOTIFICATIONS;
+	var foundEmpty = false;
+	app.notifications.forEach(function(existingNotification, index) {
+		if(existingNotification.type == NOTIFICATION_EMPTY) {
+			foundEmpty = true;
+		}
+		existingNotification.visualType = index >= lastIndex ?
+			existingNotification.type :
+			"hidden"
+		;
+	});
+
+	// Render notifications
+	d3.selectAll(".notification.empty").remove();
+	app.notificationsTemplate.render(app.notifications);
+
+	// Cleanup any empty notifications
+	app.notifications = app.notifications.filter(function(existingNotification) {
+		return existingNotification.type !== NOTIFICATION_EMPTY;
+	});
+
+	// Update notifications every 5 seconds
+	if(app.notificationUpdater) {
+		window.clearTimeout(app.notificationUpdater);
+	}
+	app.notificationUpdater = window.setTimeout(renderNotifications, foundEmpty ? 700 : UPDATE_NOTIFICATION_FREQUENCY);
+}
+
+function notifyInfo(message, timeout) {
+	addNotification({ type: NOTIFICATION_INFO, message: message, timeout: timeout });
+}
+
+function notifyError(errorOrMessage, timeout) {
+	var message = errorOrMessage;
+	if(errorOrMessage.message) {
+		// In case of Error instance
+		message = errorOrMessage.message;
+	}
+
+	// Handle specific HTTP responses
+	var nextPage;
+	if(errorOrMessage.status) {
+		if(errorOrMessage.status === HTTP_ERROR_UNAUTHORIZED) {
+			message = "Uw sessie is verlopen of u heeft geen toegangsrechten tot de gevraagde informatie. Log opnieuw in.";
+			nextPage = "login";
+		} else if(errorOrMessage.status === HTTP_ERROR_NOT_FOUND) {
+			message = "Gegevens zijn niet beschikbaar. Mogelijk zijn deze ondertussen door andere gebruiker verwijderd.";
+		} else if(errorOrMessage.status === HTTP_ERROR_CONFLICT) {
+			message = "Gegevens zijn niet correct. Mogelijk heeft een andere gebruiker ondertussen een wijziging gemaakt.";
+		} else if(errorOrMessage.status === HTTP_ERROR_BAD_REQUEST) {
+			message = "Ingevoerde gegevens zijn niet correct. Pas deze aan en probeer opnieuw.";
+		}
+	}
+
+	addNotification({ type: NOTIFICATION_ERROR, message: message, timeout: timeout });
+	if(nextPage) {
+		showPage(nextPage);
+	}
+}
+
+function notifyInvalidForm(formElement, message) {
+	addNotification({ type: NOTIFICATION_ERROR, message: "Gegevens incorrect" + (message ? ": \"" + message + "\"" : "") + ". Maak gegevens correct en probeer opnieuw." });
+}
+
+function formattedNotificationTimestamp(timestamp) {
+	var now = Date.now();
+	var seconds = Math.floor((now - timestamp) / 1000);
+	var minutes = Math.floor(seconds / 60);
+	var hours = Math.floor(minutes / 60);
+
+	if(hours === 0) {
+		if(minutes === 0) {
+			if(seconds < 30) {
+				return "";
+			} else {
+				return "(halve minuut geleden)";
+			}
+		} else if(minutes === 1) {
+			return "(minuut geleden)";
+		} else {
+			return "(" + minutes + " minuten geleden)";
+		}
+	} else {
+		return "(meer dan uur geleden)";
+	}
+}
+
 // Initialize app after full page is loaded
 function initializeAfterLoad() {
 
@@ -471,6 +620,9 @@ function initializeAfterLoad() {
 			page.actions[actionId] = action.bind(page);
 		});
 	});
+
+	// Add event handlers for main functions
+	d3.select("#dial-button").on("click", app.actions.dial);
 
 	// Add event handlers to navigation links (this is independent of location of links)
 	d3.selectAll("a.nav").each(function() {
@@ -538,9 +690,20 @@ function initializeAfterLoad() {
 		showPage("member");
 	});
 
+	// Add event handlers to notification items
+	d3.select("#notifications .close").on("click", function() {
+		var dataIndex = d3.select(this).attr("data-index");
+		if(dataIndex) {
+			removeNotification(+dataIndex);
+		}
+	});
+
 	// Create templates from pages
 	d3.selectAll("#templates > *").template();
 	d3.selectAll(".page").template();
+
+	// Create templates for notifications
+	app.notificationsTemplate = d3.select("#notifications").template();
 
 	// Show home page
 	showPage("home");
@@ -561,25 +724,6 @@ function validateForm(formElement, doNotify) {
 		return false;
 	}
 	return true;
-}
-
-// Notify the current form is invalid
-function notifyInvalidForm(formElement, message) {
-	// TODO: replace with better notification (using formElement)
-	window.alert("Gegevens incorrect" + (message ? ": \"" + message + "\"" : "") + ". Maak gegevens correct en probeer opnieuw.");
-}
-
-// Generic notify
-function notifyError(errorOrMessage) {
-	var message = errorOrMessage;
-	if(errorOrMessage.message) {
-		// In case of Error instance
-		message = errorOrMessage.message;
-	} else if(errorOrMessage.target && errorOrMessage.target.responseText) {
-		// In case of XmlHTTPRequestProgressEvent
-		message = errorOrMessage.target.responseText;
-	}
-	window.alert(message);
 }
 
 // Answer the activation token from the URL
