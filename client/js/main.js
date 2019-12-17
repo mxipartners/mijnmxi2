@@ -51,6 +51,14 @@ var app = {
 			}
 		},
 
+		// Project page
+		editProject: {
+			isUserRequired: true,
+			beforeShow: function(pageElement, data) {
+				pageElement.render(data);
+			}
+		},
+
 		// Members page showing all members of the currently selected project
 		members: {
 			isUserRequired: true,
@@ -354,9 +362,14 @@ var app = {
 			notifyError("Not implemented yet");
 		},
 		add: function() {
-			notifyError("Not implemented yet");
+			if(app.activePageId === "projects") {
+				showPage("editProject", { name: "Nieuw project" });
+			}
 		}
 	},
+
+	// Active page id
+	activePageId: null,
 
 	// Session
 	session: { token: undefined },
@@ -464,7 +477,7 @@ function sendAPIRequest(url, method, requestData, callback) {
 }
 
 // Show page
-function showPage(id) {
+function showPage(id, data) {
 
 	// Retrieve page based on id
 	var page = app.pages[id];
@@ -499,9 +512,12 @@ function showPage(id) {
 
 	// Show page
 	pageElement = d3.select("#" + id);
-	page.beforeShow(pageElement);
+	page.beforeShow(pageElement, data);
 	pageElement.classed("selected", true);	// Makes page visible
 	page.afterShow(pageElement);
+
+	// Keep track of page which is active
+	app.activePageId = id;
 }
 
 // Notification functions
