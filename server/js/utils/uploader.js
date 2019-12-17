@@ -1,12 +1,11 @@
 // Constants
 const FILENAME_TOKEN_LENGTH = 32;
 const FILENAME_PREFIX = "./uploads/";
-const VALID_FILENAME_REGEX = /^\.\/uploads\/image_[0-9a-f]+\.[^\.]*$/;
+const VALID_FILENAME_REGEX = /^\.\/uploads\/image_[0-9a-f]+\.[^.]*$/;
 
-//var IncomingForm = require("formidable").IncomingForm;
-var fs = require("fs");
-var Busboy = require("busboy");
-var Generators = require("./generators");
+let fs = require("fs");
+let Busboy = require("busboy");
+let Generators = require("./generators");
 
 
 // Class: Uploader of files
@@ -20,9 +19,9 @@ class Uploader {
 			return;
 		}
 
-		var filePaths = [];
+		let filePaths = [];
 
-		var busboy = new Busboy({
+		let busboy = new Busboy({
 			headers: httpRequest.headers,
 			limits: {
 				fileSize: 5 * 1024 * 1024,
@@ -30,13 +29,13 @@ class Uploader {
 			}
 		});
 
-		busboy.on("file", function(fieldName, file, fileName, encoding, mimeType) {
-			var fileExtension = ".jpg";	// Fake default value that most browser will hopefully forgive
-			var extensionIndex = fileName.lastIndexOf(".");
+		busboy.on("file", function(fieldName, file, fileName /*, encoding, mimeType */) {
+			let fileExtension = ".jpg";	// Fake default value that most browser will hopefully forgive
+			let extensionIndex = fileName.lastIndexOf(".");
 			if(extensionIndex >= 0) {
 				fileExtension =  fileName.slice(extensionIndex);
 			}
-			var filePath = FILENAME_PREFIX + "image_" + Generators.generateToken(FILENAME_TOKEN_LENGTH) + fileExtension;
+			let filePath = FILENAME_PREFIX + "image_" + Generators.generateToken(FILENAME_TOKEN_LENGTH) + fileExtension;
 			filePaths.push(filePath);
 			file.pipe(fs.createWriteStream(filePath));
 		});
@@ -59,7 +58,7 @@ class Uploader {
 		}
 
 		// Check valid content
-		var imagePath = httpRequest.headers["x-file-path"];
+		let imagePath = httpRequest.headers["x-file-path"];
 		if(!imagePath || !VALID_FILENAME_REGEX.test(imagePath)) {
 			responseWriter.writeHead(400, { "Content-Type": "text/plain" });
 			responseWriter.end("Bad request");

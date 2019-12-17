@@ -27,18 +27,18 @@ class API {
 		console.log("Handling " + httpRequest.method + " request " + httpRequest.url);
 
 		// Create API Request from (HTTP) request
-		var request = new Request(httpRequest, responseWriter, self.getResources());
+		let request = new Request(httpRequest, responseWriter, self.getResources());
 		
 		// Extract JSON data from request
 		if(httpRequest.headers["content-type"] === "application/json") {
 
 			// Extract data and call callback function with result
-			var data = "";
+			let data = "";
 			httpRequest.on("data", function(chunk) { data += chunk; });
 			httpRequest.on("end", function() {
 				try {
 					// If no content is present answer undefined
-					var parsedData = data.length > 0 ? JSON.parse(data) : undefined
+					let parsedData = data.length > 0 ? JSON.parse(data) : undefined
 					request.setData(parsedData);
 					self._handle(request);
 				} catch(e) {
@@ -65,14 +65,14 @@ class API {
 		endpointsCollection.forEach(function(endpointObject) {
 
 			// Make endpoint into instance
-			var endpoint = null;
+			let endpoint = null;
 			if(endpointObject.getPath) {
 				endpoint = endpointObject;
 			} else if(endpointObject.path && endpointObject.operations) {
 				endpoint = new Endpoint(endpointObject.path)
 				endpointObject.operations.forEach(function(operationObject) {
 					if(operationObject.method && operationObject.action) {
-						var operation = new Operation(operationObject.method, operationObject.action, operationObject.authorization);
+						let operation = new Operation(operationObject.method, operationObject.action, operationObject.authorization);
 						endpoint.addOperation(operation);
 					} else {
 						throw new Error("Every API operation needs to have a method and action (and can optionally have an authorization)");
@@ -100,9 +100,9 @@ class API {
 		const self = this;
 
 		// Execute action for first matching API endpoint
-		var result = null;
+		let result = null;
 		self._endpoints.some(function(endpoint) {
-			var endpointResult = endpoint.handle(request);
+			let endpointResult = endpoint.handle(request);
 			result = Result.mostSpecific(result, endpointResult);
 
 			return result.isOk();

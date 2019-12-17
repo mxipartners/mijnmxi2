@@ -1,5 +1,6 @@
 // Constants
 const CODE_OK = 200;
+const CODE_OK_WITH_DATA = 204;
 
 // Class: Result defines API results
 class Result {
@@ -15,13 +16,13 @@ class Result {
 
 	// Public class methods (constructors)
 	static fromData(data) {
-		var result = new Result(CODE_OK, null, 100);
+		let result = new Result(CODE_OK, null, 100);
 		result._data = data;
 		return result;
 	}
 	static fromSQLException(exception, defaultResult) {
 		if(exception.code) {
-			var sqlExceptionToResultCode = {
+			let sqlExceptionToResultCode = {
 				SQLITE_CONSTRAINT_UNIQUE: Result.constraintViolation,
 				SQLITE_CONSTRAINT_NOTNULL: Result.constraintViolation,
 				SQLITE_CONSTRAINT_FOREIGNKEY: Result.constraintViolation
@@ -55,7 +56,7 @@ class Result {
 	isOk() {
 		const self = this;
 
-		return self._code === CODE_OK;
+		return self._code === CODE_OK || self._code === CODE_OK_WITH_DATA;
 	}
 	hasData() {
 		const self = this;
@@ -66,9 +67,6 @@ class Result {
 		const self = this;
 
 		return self.isOk() && self.hasData();
-	}
-	isPromise() {
-		return false;
 	}
 
 	// Public class methods
@@ -85,7 +83,15 @@ class Result {
 		} else if(!otherResult) {
 			return result;
 		}
-		return result._specificity >= otherResult._specificity ? result : otherResult;
+		// Test for OK (gives priority on specificity)
+		if(result._specificity === otherResult._specificity) {
+			if(otherResult.isOk() && !result.isOk()) {
+				return otherResult;
+			} else {
+				return result;
+			}
+		}
+		return result._specificity > otherResult._specificity ? result : otherResult;
 	}
 }
 
@@ -100,9 +106,10 @@ class Result {
 // valid combination and authorization will be more specific (or an error occurring).
 Object.assign(Result, {
 	ok: new Result(CODE_OK, "OK", 100),
-	okNoData: new Result(204, "OK", 100),
+	okNoData: new Result(CODE_OK_WITH_DATA, "OK", 100),
 	invalidData: new Result(400, "Bad request", 100),
 	constraintViolation: new Result(409, "Conflict", 100),
+	noLongerAvailable: new Result(410, "Gone", 100),
 	internalError: new Result(500, "Internal error", 100),
 	unauthorized: new Result(401, "Unauthorized", 50),
 	methodNotAllowed: new Result(405, "Method not allowed", 30),
