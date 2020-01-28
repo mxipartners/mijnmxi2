@@ -120,6 +120,14 @@ addStorageOperation("getAllProjectMembers", statements.MultiReadStatement,
 		"WHERE projectId = :projectId AND " +
 			"EXISTS (SELECT * FROM members WHERE userId = :loginId AND projectId = :projectId) AND " +
 			"users.id = members.userId"
+// );
+// addStorageOperation("matchProjectsOfUser", statements.MultiReadStatement,
+	// "SELECT projects.id FROM users, sessions, projects WHERE users.id = sessions.userid" +
+	
+	// "SELECT members.id, userId, shortName, name FROM members, users " +
+		// "WHERE projectId = :projectId AND " +
+			// "EXISTS (SELECT * FROM members WHERE userId = :loginId AND projectId = :projectId) AND " +
+			// "users.id = members.userId"
 );
 addStorageOperation("deleteProjectMember", statements.SingleDeleteStatement,
 	"DELETE FROM members " +
