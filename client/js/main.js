@@ -123,6 +123,7 @@ var app = {
 							} else if(data) {
 								d.id = data.id;
 								notifyInfo("Project succesvol opgeslagen");
+								showPage("projects");
 							}
 						});
 					} else {
@@ -132,6 +133,7 @@ var app = {
 							} else if(data) {
 								Object.assign(d, input);
 								notifyInfo("Project succesvol opgeslagen");
+								showPage("projects");
 							}
 						});
 					}

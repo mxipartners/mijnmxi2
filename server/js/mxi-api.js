@@ -468,7 +468,7 @@ const createMxIAPI = function(resources) {
 				// Add user to request
 				request.addParameter("loginId", request.getResource("user").id);
 
-				// Retrieve all projects
+				// Retrieve project
 				return request.getResource("dataStore").getProject(request.getParameters());
 			}
 		},
