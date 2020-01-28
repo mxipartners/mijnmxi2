@@ -276,6 +276,21 @@ a.action {
 */
 }
 
+/* unvisited link */
+a:link {
+  color: var(--text-color);
+}
+
+/* visited link */
+a:visited {
+  color: var(--text-color);
+}
+
+/* mouse over link */
+a:hover {
+  color: var(--highlight-color);
+}
+
 /* Notifications */
 #notifications {
 	display: block;
