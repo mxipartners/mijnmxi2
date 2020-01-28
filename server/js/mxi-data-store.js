@@ -116,8 +116,9 @@ addStorageOperation("addProjectMember", statements.SingleCreateStatement,
 		")"
 );
 addStorageOperation("getAllProjectMembers", statements.MultiReadStatement,
-	"SELECT members.id, userId, projectId, shortName, name FROM members, users " +
-		"WHERE projectId = :projectId AND :loginId IN (SELECT userId FROM projects WHERE id = :projectId) AND " +
+	"SELECT members.id, userId, shortName, name FROM members, users " +
+		"WHERE projectId = :projectId AND " +
+			"EXISTS (SELECT * FROM members WHERE userId = :loginId AND projectId = :projectId) AND " +
 			"users.id = members.userId"
 );
 addStorageOperation("deleteProjectMember", statements.SingleDeleteStatement,
