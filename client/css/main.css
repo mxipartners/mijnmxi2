@@ -283,12 +283,12 @@ a:link {
 
 /* mouse over link */
 a:hover {
-  color: rgb(247, 214, 47);
+  color: var(--highlight-color);
 }
 
 /* selected link */
 a:active {
-  color: rgb(211, 210, 210);
+  color: rgb(210, 210, 210);
 }
 
 
