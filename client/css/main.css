@@ -2,11 +2,12 @@
 :root {
 	/* Colors */
 	--background-color: rgb(74, 92, 104);
-	--text-color: rgb(102, 102, 102);
+	--text-color: rgb(255, 255, 255);
 	--input-background-color: rgb(102, 117, 126);
 	--input-text-color: rgb(255, 255, 255);
 	--input-text-placeholder-color: rgb(176, 176, 176);
 	--highlight-color: rgb(255, 207, 0);
+	
 
 	/* Dimensions */
 	--button-size: 3rem;
@@ -275,6 +276,21 @@ a.action {
 	padding: 0.3em;
 */
 }
+/* unvisited link */
+a:link {
+  color: var(--text-color);
+}
+
+/* mouse over link */
+a:hover {
+  color: rgb(247, 214, 47);
+}
+
+/* selected link */
+a:active {
+  color: rgb(210, 210, 210);
+}
+
 
 /* Notifications */
 #notifications {
