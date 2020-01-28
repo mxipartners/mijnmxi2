@@ -62,7 +62,7 @@
 			<div class="content">
 				<h3>Overzicht Projecten</h3>
 				<ul data-repeat="{{d}}">
-					<li><a class="action" href="#showProject">{{d.name}}</a> <a class="action" href="#removeMe">Remove me</a></li>
+					<li><a class="action" href="#showProject">{{d.name}}</a> <a class="action" href="#removeMe">Verwijderen</a></li>
 				</ul>
 				<a class="nav" href="#home">Terug</a>
 			</div>
@@ -78,7 +78,7 @@
 				<h1>Projectpagina</h1>
 				<div class="project">
 					<ul data-repeat="{{d.members}}">
-						<li><span>{{d.name}}</span> <a class="action" href="#remove">Remove</a></li>
+						<li><span>{{d.name}}</span> <a class="action" href="#remove">Verwijderen</a></li>
 					</ul>
 				</div>
 				<a class="action" href="#edit">Aanpassen</a>
@@ -132,13 +132,16 @@
 			</div>
 		</div>
 		<div id="member" class="page">
-			<div data-import="{{'#first-dial-buttons'}}"></div>
-			<div class="content">
-			Deelnemer pagina - test
-			<h1>{{d.name}}</h1>
-			<h3>{{d.shortName}}</h3>
-			<h3>{{d.email}}</h3>
-			<a class="nav" href="#home">Terug</a>
+			<div data-import="{{'#first-dial-buttons'}}">
+				<!-- This tag is intentionally left blank -->
+			</div>
+				<div class="content">
+				Deelnemer pagina - test
+					<span>{{d.name}}</span>
+					<a class="nav" href="#home">Terug</a>
+				</div>
+			<div data-import="{{'#second-dial-buttons'}}">
+				<!-- This tag is intentionally left blank -->
 			</div>
 		</div>
 		<div id="profile" class="page">
