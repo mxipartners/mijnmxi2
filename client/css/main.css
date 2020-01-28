@@ -2,7 +2,7 @@
 :root {
 	/* Colors */
 	--background-color: rgb(74, 92, 104);
-	--text-color: rgb(102, 102, 102);
+	--text-color: rgb(195, 195, 195);
 	--input-background-color: rgb(102, 117, 126);
 	--input-text-color: rgb(255, 255, 255);
 	--input-text-placeholder-color: rgb(176, 176, 176);
@@ -11,6 +11,7 @@
 	/* Dimensions */
 	--button-size: 3rem;
 	--button-group-size: 4rem;
+
 
 	/* Transition timing */
 	--ease: .5s ease .1s;
@@ -261,6 +262,10 @@ input:invalid {
 }
 
 /* Navigation elements */
+a{
+color: rgb(250,250,250);	
+}
+
 a.nav {
 	display: block;
 	padding-top: 0.3rem;
