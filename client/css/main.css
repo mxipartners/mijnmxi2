@@ -7,6 +7,7 @@
 	--input-text-color: rgb(255, 255, 255);
 	--input-text-placeholder-color: rgb(176, 176, 176);
 	--highlight-color: rgb(255, 207, 0);
+	
 
 	/* Dimensions */
 	--button-size: 3rem;
@@ -280,6 +281,21 @@ a.action {
 	padding: 0.3em;
 */
 }
+/* unvisited link */
+a:link {
+  color: var(--text-color);
+}
+
+/* mouse over link */
+a:hover {
+  color: rgb(247, 214, 47);
+}
+
+/* selected link */
+a:active {
+  color: rgb(209, 210, 210);
+}
+
 
 /* Notifications */
 #notifications {
