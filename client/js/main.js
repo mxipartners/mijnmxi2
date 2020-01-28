@@ -84,7 +84,6 @@ var app = {
 			actions: {
 				edit: function(d) {
 					app.selections.project = d;
-					app.selections.projectId = d.id;
 					showPage("editProject", d);
 				},
 				remove: function(d) {
@@ -225,13 +224,8 @@ var app = {
 		// Member page showing the details of a project member
 		member: {
 			isUserRequired: true,
-			beforeShow: function(pageElement) {
-				if(!app.selections.memberId) {
-					console.error("No member selected!");
-					return;
-				}
-				//pageElement.render(app.selections.member);
-				console.log("Show member with id " + app.selections.memberId);
+			beforeShow: function(pageElement, member) {
+				pageElement.render(member || app.selections.member);
 			}
 		},
 
@@ -912,8 +906,8 @@ function initializeAfterLoad() {
 
 	// Add event handlers to list items
 	d3.select("#members li").on("click", function(d) {
-		app.selections.memberId = d.id;
-		showPage("member");
+		app.selections.member = d;
+		showPage("member", d);
 	});
 
 	// Add event handlers to notification items
